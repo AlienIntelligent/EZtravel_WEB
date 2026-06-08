@@ -1,0 +1,27 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "auth": {
+        "ClusterId": "auth",
+        "Match": { "Path": "/api/auth/{**catch-all}" }
+      },
+      "trip": {
+        "ClusterId": "trip",
+        "Match": { "Path": "/api/trips/{**catch-all}" },
+        "AuthorizationPolicy": "default"
+      }
+    },
+    "Clusters": {
+      "auth": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7001" }
+        }
+      },
+      "trip": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7002" }
+        }
+      }
+    }
+  }
+}

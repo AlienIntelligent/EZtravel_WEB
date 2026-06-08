@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/Common/">
+    <Project Path="Common/ezTravel.Common/ezTravel.Common.csproj" />
+  </Folder>
+  <Folder Name="/DataAccess/">
+    <Project Path="DataAccess/ezTravel.Entities/ezTravel.Entities.csproj" />
+    <Project Path="DataAccess/ezTravel.Libs/ezTravel.Libs.csproj" />
+    <Project Path="DataAccess/ezTravel.Repository/ezTravel.Repository.csproj" />
+  </Folder>
+  <Folder Name="/Microservices/">
+    <Project Path="Microservices/ezTravel.AdminService/ezTravel.AdminService.csproj" />
+    <Project Path="Microservices/ezTravel.ApiGateway/ezTravel.ApiGateway.csproj" />
+    <Project Path="Microservices/ezTravel.AuthService/ezTravel.AuthService.csproj" />
+    <Project Path="Microservices/ezTravel.BookingService/ezTravel.BookingService.csproj" />
+    <Project Path="Microservices/ezTravel.CommunityService/ezTravel.CommunityService.csproj" />
+    <Project Path="Microservices/ezTravel.PlaceService/ezTravel.PlaceService.csproj" />
+    <Project Path="Microservices/ezTravel.TripService/ezTravel.TripService.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="Services/ezTravel.DTO/ezTravel.DTO.csproj" />
+    <Project Path="Services/ezTravel.Services/ezTravel.Services.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/ezTravel.IntegrationTests/ezTravel.IntegrationTests.csproj" />
+    <Project Path="Tests/ezTravel.UnitTests/ezTravel.UnitTests.csproj" />
+  </Folder>
+</Solution>

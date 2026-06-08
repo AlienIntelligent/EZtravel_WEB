@@ -1,0 +1,6 @@
+@ezTravel.ApiGateway_HostAddress = http://localhost:5108
+
+GET {{ezTravel.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

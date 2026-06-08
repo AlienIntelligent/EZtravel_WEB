@@ -1,0 +1,6 @@
+@ezTravel.BookingService_HostAddress = http://localhost:5155
+
+GET {{ezTravel.BookingService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
