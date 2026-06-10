@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "../assets/css/admin-custom.css";
@@ -7,6 +7,35 @@ const MainLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
+
+  useEffect(() => {
+    // Add AdminLTE CSS
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css";
+    link.id = "adminlte-css";
+    document.head.appendChild(link);
+    
+    // Add AdminLTE JS
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js";
+    script.id = "adminlte-js";
+    document.body.appendChild(script);
+
+    // Add layout class to body
+    document.body.classList.add('sidebar-mini');
+    
+    return () => {
+      // Remove AdminLTE CSS & JS
+      const existingLink = document.getElementById("adminlte-css");
+      if (existingLink) document.head.removeChild(existingLink);
+      
+      const existingScript = document.getElementById("adminlte-js");
+      if (existingScript) document.body.removeChild(existingScript);
+      
+      document.body.classList.remove('sidebar-mini');
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();

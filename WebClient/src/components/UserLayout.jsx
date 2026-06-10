@@ -12,21 +12,15 @@ const UserLayout = ({ children }) => {
         window.scrollTo(0, 0);
 
         // Re-initialize animations and jQuery plugins
-        if (window.jQuery) {
-            const $ = window.jQuery;
-            
+        if (window.initEzTravelUI) {
             // Give React a moment to render the new components
             setTimeout(() => {
-                // Trigger scroll to activate Waypoints
-                $(window).trigger('scroll');
+                window.initEzTravelUI();
                 
-                // If main.js hasn't initialized some elements, we can force them
+                // Refresh AOS animations
                 if (window.AOS) {
                     window.AOS.refresh();
                 }
-
-                // Force visibility for testing if animations still fail
-                // $('.ftco-animate').addClass('ftco-animated fadeInUp');
             }, 100);
         }
     }, [location.pathname]);
@@ -38,7 +32,7 @@ const UserLayout = ({ children }) => {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-dark ftco_navbar ftco-navbar-light" id="ftco-navbar">
+            <nav className="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
                 <div className="container">
                     <Link className="navbar-brand" to="/">EZtravel.</Link>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
