@@ -3,6 +3,7 @@ using ezTravel.Common.Responses;
 using ezTravel.DTO.Auth;
 using ezTravel.Entities;
 using ezTravel.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ezTravel.Services.Auth;
 
@@ -21,7 +22,7 @@ public class AuthService : IAuthService
     {
         var exists = await _uow.NguoiDungs.AnyAsync(x => x.Email == request.Email);
         if (exists)
-            return BaseResponse<AuthResponse>.Fail("Email d� t?n t?i");
+            return BaseResponse<AuthResponse>.Fail("Email đã tồn tại");
 
         var user = new NguoiDung
         {
@@ -36,7 +37,9 @@ public class AuthService : IAuthService
         return BaseResponse<AuthResponse>.Ok(new AuthResponse
         {
             UserId = user.MaNguoiDung,
+            Name = user.HoTen,
             Email = user.Email,
+            Role = user.VaiTro,
             Token = _jwt.GenerateToken(user)
         });
     }
@@ -47,12 +50,14 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(x => x.Email == request.Email);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.MatKhau, user.MatKhau))
-            return BaseResponse<AuthResponse>.Fail("Sai email ho?c m?t kh?u");
+            return BaseResponse<AuthResponse>.Fail("Sai email hoặc mật khẩu");
 
         return BaseResponse<AuthResponse>.Ok(new AuthResponse
         {
             UserId = user.MaNguoiDung,
+            Name = user.HoTen,
             Email = user.Email,
+            Role = user.VaiTro,
             Token = _jwt.GenerateToken(user)
         });
     }
