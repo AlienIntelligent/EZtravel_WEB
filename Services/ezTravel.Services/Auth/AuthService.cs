@@ -28,7 +28,8 @@ public class AuthService : IAuthService
         {
             HoTen = request.HoTen,
             Email = request.Email,
-            MatKhau = BCrypt.Net.BCrypt.HashPassword(request.MatKhau)
+            MatKhau = BCrypt.Net.BCrypt.HashPassword(request.MatKhau),
+            VaiTro = request.VaiTro ?? ezTravel.Common.Constants.Roles.Traveler
         };
 
         await _uow.NguoiDungs.AddAsync(user);
@@ -39,7 +40,7 @@ public class AuthService : IAuthService
             UserId = user.MaNguoiDung,
             Name = user.HoTen,
             Email = user.Email,
-            Role = user.VaiTro,
+            Role = user.VaiTro ?? "Traveler",
             Token = _jwt.GenerateToken(user)
         });
     }
@@ -57,7 +58,7 @@ public class AuthService : IAuthService
             UserId = user.MaNguoiDung,
             Name = user.HoTen,
             Email = user.Email,
-            Role = user.VaiTro,
+            Role = user.VaiTro ?? "Traveler",
             Token = _jwt.GenerateToken(user)
         });
     }

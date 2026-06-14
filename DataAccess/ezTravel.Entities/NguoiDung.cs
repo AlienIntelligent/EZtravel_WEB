@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,17 +37,17 @@ public class NguoiDung
 
     [Column("vai_tro")]
     [StringLength(20)]
-    public string VaiTro { get; set; } = "User";
+    public string? VaiTro { get; set; } = "Traveler";
 
     [Column("trang_thai")]
     [StringLength(20)]
-    public string TrangThai { get; set; } = "HoatDong";
+    public string? TrangThai { get; set; } = "HoatDong";
 
     [Column("ngay_tao", TypeName = "datetime")]
-    public DateTime NgayTao { get; set; } = DateTime.UtcNow;
+    public DateTime? NgayTao { get; set; } = DateTime.UtcNow;
 
     [Column("da_xoa")]
-    public bool DaXoa { get; set; } = false;
+    public bool? DaXoa { get; set; } = false;
 
     // Navigation
     public virtual ICollection<LichTrinh> LichTrinhs { get; set; } = new List<LichTrinh>();

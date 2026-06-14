@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { categoryApi } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { categoryApi } from '../../api';
+import useAuthStore from '../../store/authStore';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -12,7 +12,7 @@ const Categories = () => {
         description: '',
     });
     const [error, setError] = useState('');
-    const { isAdmin } = useAuth();
+    const { isAdmin } = useAuthStore();
 
     useEffect(() => {
         loadCategories();

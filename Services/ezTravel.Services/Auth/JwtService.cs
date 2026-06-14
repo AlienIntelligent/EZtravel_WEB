@@ -23,9 +23,9 @@ public class JwtService
 
         var claims = new[]
         {
-            new Claim("sub", user.MaNguoiDung.ToString()),
-            new Claim("email", user.Email),
-            new Claim("role", user.VaiTro)
+            new Claim(JwtRegisteredClaimNames.Sub, user.MaNguoiDung.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.VaiTro ?? string.Empty)
         };
 
         var creds = new SigningCredentials(

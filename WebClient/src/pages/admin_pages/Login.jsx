@@ -1,30 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import UserLayout from '../../components/UserLayout';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import useAuthStore from '../../store/authStore';
+import UserLayout from '../../layouts/UserLayout';
+
+const loginSchema = z.object({
+    email: z.string().email('Email không hợp lệ'),
+    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+});
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, loading, error: authError } = useAuthStore();
+    const [localError, setLocalError] = useState('');
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(loginSchema),
+    });
 
-        const result = await login(email, password);
+    const onSubmit = async (data) => {
+        setLocalError('');
+        const result = await login(data.email, data.password);
 
         if (result.success) {
-            navigate('/');
+            const role = result.user.role || result.user.Role;
+            if (role?.toString().toLowerCase() === 'admin') {
+                navigate('/dashboard');
+            } else {
+                navigate('/');
+            }
         } else {
-            setError(result.message);
+            setLocalError(result.message);
         }
-
-        setLoading(false);
     };
 
     return (
@@ -53,37 +66,35 @@ const Login = () => {
                             <div className="card p-5 shadow">
                                 <h3 className="text-center mb-4">Đăng Nhập EZtravel</h3>
 
-                                {error && (
+                                { (localError || authError) && (
                                     <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                                        {error}
-                                        <button type="button" className="close" onClick={() => setError('')}>
+                                        {localError || authError}
+                                        <button type="button" className="close" onClick={() => setLocalError('')}>
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                 )}
 
-                                <form onSubmit={handleSubmit}>
+                                <form onSubmit={handleSubmit(onSubmit)}>
                                     <div className="form-group">
                                         <label>Email</label>
                                         <input
                                             type="email"
-                                            className="form-control"
+                                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                             placeholder="Nhập email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required
+                                            {...register('email')}
                                         />
+                                        {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>Mật khẩu</label>
                                         <input
                                             type="password"
-                                            className="form-control"
+                                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                                             placeholder="Mật khẩu"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
+                                            {...register('password')}
                                         />
+                                        {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                                     </div>
 
                                     <div className="form-group text-right">

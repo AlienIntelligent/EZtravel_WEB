@@ -1,4 +1,4 @@
-﻿using ezTravel.Entities;
+using ezTravel.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ezTravel.Libs;
@@ -181,11 +181,11 @@ public class AppDbContext : DbContext
         });
 
         // ── Soft delete filter (tự động lọc bản ghi đã xóa) ──
-        modelBuilder.Entity<NguoiDung>().HasQueryFilter(x => !x.DaXoa);
-        modelBuilder.Entity<LichTrinh>().HasQueryFilter(x => !x.DaXoa);
-        modelBuilder.Entity<DiaDiem>().HasQueryFilter(x => !x.DaXoa);
-        modelBuilder.Entity<DichVu>().HasQueryFilter(x => !x.DaXoa);
-        modelBuilder.Entity<MaGiamGia>().HasQueryFilter(x => !x.DaXoa);
+        modelBuilder.Entity<NguoiDung>().HasQueryFilter(x => x.DaXoa != true);
+        modelBuilder.Entity<LichTrinh>().HasQueryFilter(x => x.DaXoa != true);
+        modelBuilder.Entity<DiaDiem>().HasQueryFilter(x => x.DaXoa != true);
+        modelBuilder.Entity<DichVu>().HasQueryFilter(x => x.DaXoa != true);
+        modelBuilder.Entity<MaGiamGia>().HasQueryFilter(x => x.DaXoa != true);
     }
 
     // ── Override SaveChanges để tự động set NgayTao ──
