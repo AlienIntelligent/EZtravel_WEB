@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { productApi, userApi, categoryApi } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { productApi, userApi, categoryApi } from '../../api';
+import useAuthStore from '../../store/authStore';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -9,7 +9,7 @@ const Dashboard = () => {
         users: 0,
     });
     const [loading, setLoading] = useState(true);
-    const { isAdmin } = useAuth();
+    const { isAdmin } = useAuthStore();
 
     useEffect(() => {
         loadStats();

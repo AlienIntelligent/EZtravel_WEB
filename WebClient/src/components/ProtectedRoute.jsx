@@ -1,34 +1,20 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+    const { user, isAdmin } = useAuthStore();
+    const isAuthenticated = !!user;
 
-  if (loading) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
 
-  // Chưa đăng nhập → về Login
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+    if (adminOnly && !isAdmin()) {
+        return <Navigate to="/" replace />;
+    }
 
-  // Admin-only route mà user không phải Admin → về Home
-  if (adminOnly && !isAdmin()) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
+    return children;
 };
 
 export default ProtectedRoute;

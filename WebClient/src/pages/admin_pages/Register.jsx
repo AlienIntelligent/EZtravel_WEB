@@ -1,40 +1,41 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authApi } from "../../services/api";
-import UserLayout from "../../components/UserLayout";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { authApi } from "../../api";
+import UserLayout from "../../layouts/UserLayout";
+
+const registerSchema = z.object({
+  hoTen: z.string().min(2, "Họ tên phải có ít nhất 2 ký tự"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+  confirmPassword: z.string().min(6, "Mật khẩu xác nhận phải có ít nhất 6 ký tự"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Mật khẩu xác nhận không khớp",
+  path: ["confirmPassword"],
+});
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    hoTen: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setError("");
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      const response = await authApi.register(formData);
+      const response = await authApi.register(data);
       if (response.data) {
         setSuccess(true);
         setTimeout(() => navigate("/login"), 2000);
@@ -87,54 +88,46 @@ const Register = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="form-group">
                     <label>Họ tên</label>
                     <input
                       type="text"
-                      name="hoTen"
-                      className="form-control"
+                      className={`form-control ${errors.hoTen ? 'is-invalid' : ''}`}
                       placeholder="Nhập họ tên"
-                      value={formData.hoTen}
-                      onChange={handleChange}
-                      required
+                      {...register("hoTen")}
                     />
+                    {errors.hoTen && <div className="invalid-feedback">{errors.hoTen.message}</div>}
                   </div>
                   <div className="form-group">
                     <label>Email</label>
                     <input
                       type="email"
-                      name="email"
-                      className="form-control"
+                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                       placeholder="Nhập email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
+                      {...register("email")}
                     />
+                    {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
                   </div>
                   <div className="form-group">
                     <label>Mật khẩu</label>
                     <input
                       type="password"
-                      name="password"
-                      className="form-control"
+                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                       placeholder="Mật khẩu"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
+                      {...register("password")}
                     />
+                    {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
                   </div>
                   <div className="form-group">
                     <label>Xác nhận mật khẩu</label>
                     <input
                       type="password"
-                      name="confirmPassword"
-                      className="form-control"
+                      className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
                       placeholder="Xác nhận mật khẩu"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
+                      {...register("confirmPassword")}
                     />
+                    {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword.message}</div>}
                   </div>
 
                   <button

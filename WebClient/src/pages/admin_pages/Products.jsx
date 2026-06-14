@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { productApi, categoryApi } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { productApi, categoryApi } from '../../api';
+import useAuthStore from '../../store/authStore';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -23,7 +23,7 @@ const Products = () => {
         categoryId: '',
     });
     const [error, setError] = useState('');
-    const { isAdmin } = useAuth();
+    const { isAdmin } = useAuthStore();
 
     useEffect(() => {
         loadCategories();
