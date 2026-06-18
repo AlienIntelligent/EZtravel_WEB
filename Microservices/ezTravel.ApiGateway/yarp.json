@@ -9,6 +9,28 @@
         "ClusterId": "trip",
         "Match": { "Path": "/api/trips/{**catch-all}" },
         "AuthorizationPolicy": "default"
+      },
+      "place": {
+        "ClusterId": "place",
+        "Match": { "Path": "/api/places/{**catch-all}" }
+      },
+      "booking": {
+        "ClusterId": "booking",
+        "Match": { "Path": "/api/bookings/{**catch-all}" },
+        "AuthorizationPolicy": "default"
+      },
+      "community_reviews": {
+        "ClusterId": "community",
+        "Match": { "Path": "/api/reviews/{**catch-all}" }
+      },
+      "community_feeds": {
+        "ClusterId": "community",
+        "Match": { "Path": "/api/feeds/{**catch-all}" }
+      },
+      "admin": {
+        "ClusterId": "admin",
+        "Match": { "Path": "/api/admin/{**catch-all}" },
+        "AuthorizationPolicy": "AdminOnly"
       }
     },
     "Clusters": {
@@ -20,6 +42,26 @@
       "trip": {
         "Destinations": {
           "d1": { "Address": "https://localhost:7002" }
+        }
+      },
+      "place": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7003" }
+        }
+      },
+      "booking": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7004" }
+        }
+      },
+      "community": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7005" }
+        }
+      },
+      "admin": {
+        "Destinations": {
+          "d1": { "Address": "https://localhost:7006" }
         }
       }
     }

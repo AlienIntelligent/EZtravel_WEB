@@ -1,27 +1,26 @@
 # Bản Đồ Dự Án: ezTravel
 
 ## 1. Tổng Quan Kiến Trúc
-ezTravel được xây dựng trên **Kiến trúc Microservices** với sự tách biệt rõ ràng giữa frontend, các dịch vụ backend và lớp truy cập dữ liệu.
+ezTravel được xây dựng trên **Kiến trúc Microservices** với sự tách biệt rõ ràng giữa frontend, các dịch vụ backend và lớp truy cập dữ liệu. Toàn bộ hệ thống được điều phối qua **API Gateway (YARP)**.
 
 ### Sơ Đồ Hệ Thống
 ```mermaid
 graph TD
-    WebClient[WebClient - React/Vite] --> ApiGateway[Microservices.ApiGateway]
+    WebClient[WebClient - React/Vite] --> ApiGateway[ApiGateway - Port 7000]
     
     subgraph Backend Microservices
-        ApiGateway --> AuthService[Microservices.AuthService]
-        ApiGateway --> AdminService[Microservices.AdminService]
-        ApiGateway --> BookingService[Microservices.BookingService]
-        ApiGateway --> CommunityService[Microservices.CommunityService]
-        ApiGateway --> PlaceService[Microservices.PlaceService]
-        ApiGateway --> TripService[Microservices.TripService]
+        ApiGateway --> AuthService[AuthService - Port 7001]
+        ApiGateway --> TripService[TripService - Port 7002]
+        ApiGateway --> PlaceService[PlaceService - Port 7003]
+        ApiGateway --> BookingService[BookingService - Port 7004]
+        ApiGateway --> CommunityService[CommunityService - Port 7005]
+        ApiGateway --> AdminService[AdminService - Port 7006]
     end
 
-    subgraph Business Logic Layer
-        AuthService -.-> SrvAuth[Services.ezTravel.Services]
-        AdminService -.-> SrvAuth
-        BookingService -.-> SrvAuth
-        TripService -.-> SrvAuth
+    subgraph Logic & Data Layer
+        AuthService & TripService & PlaceService & BookingService & CommunityService & AdminService -.-> Services[ezTravel.Services / ezTravel.DTO]
+        Services -.-> Repository[ezTravel.Repository / Unit of Work]
+        Repository -.-> Database[(SQL Server)]
     end
 ```
 
@@ -33,39 +32,39 @@ Tuân thủ tiêu chuẩn `AI_RULES.md`:
 - `src/layouts`: Các bố cục ứng dụng (MainLayout, UserLayout).
 - `src/routes`: Cấu hình định tuyến tập trung và bảo mật (Guards).
 - `src/pages`: 
-  - `admin_pages`: Login, Dashboard, Products, Users, Categories.
+  - `admin_pages`: Quản lý người dùng, Dashboard, Kiểm duyệt.
   - `user_pages`: Home, Tours, Hotels, Blogs, About, Contact.
 - `src/components`: Các thành phần dùng chung (ProtectedRoute, PublicRoute).
 - `src/hooks`, `src/utils`, `src/constants`, `src/lib`, `src/types`: Các tiện ích mô-đun hóa.
 
 ## 3. Cấu Trúc Backend (Microservices & Services)
 
-### Các Dịch Vụ Backend
-- `ezTravel.AuthService`: Xác thực, JWT và Định danh.
-- `ezTravel.AdminService`: Quản lý hệ thống và báo cáo.
-- `ezTravel.BookingService`: Xử lý đặt chỗ và thanh toán.
-- `ezTravel.PlaceService`: Quản lý điểm đến và dịch vụ.
-- `ezTravel.TripService`: Lập kế hoạch và chia sẻ lộ trình.
+### Các Dịch Vụ Backend (Ports: 7001-7006)
+- **ezTravel.AuthService (7001):** Xác thực, JWT, Đăng ký/Đăng nhập.
+- **ezTravel.TripService (7002):** Lập kế hoạch, quản lý Timeline, Reorder, Tính chi phí.
+- **ezTravel.PlaceService (7003):** Tìm kiếm địa điểm, Nearby Search, Thông tin chi tiết.
+- **ezTravel.BookingService (7004):** Đặt dịch vụ, Giỏ hàng, Thanh toán (Mock).
+- **ezTravel.CommunityService (7005):** Đánh giá (Reviews), Chia sẻ lịch trình (Feeds).
+- **ezTravel.AdminService (7006):** Quản trị người dùng, Thống kê hệ thống.
 
 ### Lớp Nghiệp Vụ & Dữ Liệu
-- `Services/ezTravel.Services`: Triển khai logic nghiệp vụ cốt lõi.
-- `Services/ezTravel.DTO`: Các đối tượng chuyển đổi dữ liệu cho API.
-- `DataAccess/ezTravel.Entities`: Các mô hình thực thể cơ sở dữ liệu dùng chung.
-- `DataAccess/ezTravel.Libs`: Context cơ sở dữ liệu (`AppDbContext.cs`).
-- `DataAccess/ezTravel.Repository`: Triển khai mô hình Repository & Unit of Work.
+- `Services/ezTravel.Services`: Triển khai logic nghiệp vụ (Auth, Trips, Places, Bookings, v.v.).
+- `Services/ezTravel.DTO`: Định nghĩa các đối tượng trao đổi dữ liệu.
+- `DataAccess/ezTravel.Entities`: Thực thể cơ sở dữ liệu.
+- `DataAccess/ezTravel.Libs`: Database Context (`AppDbContext.cs`).
+- `DataAccess/ezTravel.Repository`: Repository Pattern & Unit of Work.
 
 ## 4. Luồng Dữ Liệu
-`UI (React) -> Store (Zustand) -> API Client (Axios) -> Backend Controller -> Service -> Repository -> Database (SQL Server)`
+`UI (React) -> Store (Zustand) -> API Client (Axios) -> ApiGateway (7000) -> Microservice Controller -> Service -> Repository -> Database`
 
 ## 5. Tài Khoản Kiểm Thử (Test Accounts)
-Dùng để kiểm tra phân quyền hệ thống:
 
 | Vai trò | Email | Mật khẩu | Ghi chú |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@eztravel.com` | `Admin@123` | Toàn quyền, truy cập Dashboard |
-| **Traveler** | `traveler@gmail.com` | `Password@123` | Người dùng mặc định |
-| **ServiceProvider** | `partner@muongthanh.com` | `Partner@123` | Nhà cung cấp dịch vụ (guide) |
-| **Guest** | `guest@test.com` | `Guest@123` | Khách vãng lai |
+| **Admin** | `admin@eztravel.com` | `Admin@123` | Truy cập Dashboard Admin (Port 7006) |
+| **Traveler** | `traveler@gmail.com` | `Password@123` | Người dùng lập kế hoạch & đặt dịch vụ |
+| **ServiceProvider** | `partner@muongthanh.com` | `Partner@123` | Nhà cung cấp (Tương lai) |
+| **Guest** | `guest@test.com` | `Guest@123` | Chỉ xem thông tin công khai |
 
 ---
-*Cập nhật lần cuối: 06/05/2026*
+*Cập nhật lần cuối: 06/05/2026 - Đồng bộ cổng 7000 và hoàn thiện logic services*

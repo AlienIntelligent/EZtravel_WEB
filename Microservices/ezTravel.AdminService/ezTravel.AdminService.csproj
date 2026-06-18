@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Services\ezTravel.Services\ezTravel.Services.csproj" />
     <ProjectReference Include="..\..\Common\ezTravel.Common\ezTravel.Common.csproj" />
+    <ProjectReference Include="..\..\DataAccess\ezTravel.Repository\ezTravel.Repository.csproj" />
   </ItemGroup>
 
 </Project>
