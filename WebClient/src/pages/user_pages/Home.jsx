@@ -1,7 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+    communityFeeds,
+    destinations,
+    formatCompactCurrency,
+    formatCurrency,
+    formatDate,
+    hotels,
+    restaurants,
+    testimonials,
+    trips,
+} from '../../data/usecaseData';
+
+const Rating = ({ value, reviews }) => (
+    <p className="rate">
+        {[0, 1, 2, 3, 4].map((index) => (
+            <i key={index} className={index < Math.round(value) ? 'icon-star' : 'icon-star-o'}></i>
+        ))}
+        <span>{reviews} danh gia</span>
+    </p>
+);
 
 const Home = () => {
+    const topTrips = trips.slice(0, 6);
+    const featuredHotels = hotels.slice(0, 6);
+    const latestFeeds = communityFeeds.slice(0, 4);
+    const counters = [
+        { label: 'Nguoi dung', value: 2480 },
+        { label: 'Diem den', value: destinations.length },
+        { label: 'Lich trinh mau', value: trips.length },
+        { label: 'Dich vu luu tru', value: hotels.length },
+    ];
+
     return (
         <>
             <div
@@ -10,52 +40,39 @@ const Home = () => {
             >
                 <div className="overlay"></div>
                 <div className="container">
-                    <div
-                        className="row no-gutters slider-text js-fullheight align-items-center justify-content-start"
-                        data-scrollax-parent="true"
-                    >
-                        <div
-                            className="col-md-9 ftco-animate"
-                            data-scrollax=" properties: { translateY: '70%' }"
-                        >
-                            <h1
-                                className="mb-4"
-                                data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"
-                            >
-                                <strong>Khám Phá Việt Nam</strong><br />Theo cách của bạn
+                    <div className="row no-gutters slider-text js-fullheight align-items-center justify-content-start">
+                        <div className="col-md-9 ftco-animate">
+                            <h1 className="mb-4">
+                                <strong>EZTravel</strong><br />Lap lich trinh tu tuc tren mot nen tang
                             </h1>
-                            <p data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">
-                                Lộ trình tự túc chi tiết • Homestay đẹp • Tips thực tế từ người đi trước
+                            <p>
+                                Tim dia diem, clone itinerary, tinh chi phi, dat dich vu va chia se trai nghiem cong dong.
                             </p>
 
                             <div className="block-17 my-4">
-                                <form action="#" method="post" className="d-block d-flex">
+                                <form action="/tours" method="get" className="d-block d-flex">
                                     <div className="fields d-block d-flex">
                                         <div className="textfield-search one-third">
                                             <input
                                                 type="text"
+                                                name="keyword"
                                                 className="form-control"
-                                                placeholder="Bạn muốn đi đâu? (Đà Nẵng, Phú Quốc...)"
+                                                placeholder="Ban muon di dau? Da Nang, Ha Giang..."
                                             />
                                         </div>
                                         <div className="select-wrap one-third">
                                             <div className="icon">
                                                 <span className="ion-ios-arrow-down"></span>
                                             </div>
-                                            <select className="form-control" style={{ color: '#000' }}>
-                                                <option value="">Thời gian</option>
-                                                <option value="">2-3 ngày</option>
-                                                <option value="">4-5 ngày</option>
-                                                <option value="">7 ngày</option>
-                                                <option value="">10+ ngày</option>
+                                            <select name="days" className="form-control" style={{ color: '#000' }}>
+                                                <option value="">Thoi gian</option>
+                                                <option value="2">2-3 ngay</option>
+                                                <option value="4">4-5 ngay</option>
+                                                <option value="7">7 ngay</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <input
-                                        type="submit"
-                                        className="search-submit btn btn-primary"
-                                        value="Tìm kiếm"
-                                    />
+                                    <input type="submit" className="search-submit btn btn-primary" value="Tim kiem" />
                                 </form>
                             </div>
                         </div>
@@ -66,50 +83,24 @@ const Home = () => {
             <section className="ftco-section services-section bg-light">
                 <div className="container">
                     <div className="row d-flex">
-                        <div className="col-md-3 d-flex align-self-stretch ftco-animate">
-                            <div className="media block-6 services d-block text-center">
-                                <div className="d-flex justify-content-center">
-                                    <div className="icon"><span className="flaticon-guarantee"></span></div>
-                                </div>
-                                <div className="media-body p-2 mt-2">
-                                    <h3 className="heading mb-3">Đảm bảo giá tốt</h3>
-                                    <p>Cam kết mức giá cạnh tranh nhất cho mọi dịch vụ đặt chỗ.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-3 d-flex align-self-stretch ftco-animate">
-                            <div className="media block-6 services d-block text-center">
-                                <div className="d-flex justify-content-center">
-                                    <div className="icon"><span className="flaticon-like"></span></div>
-                                </div>
-                                <div className="media-body p-2 mt-2">
-                                    <h3 className="heading mb-3">Khách hàng tin tưởng</h3>
-                                    <p>Cộng đồng hàng ngàn người dùng chia sẻ kinh nghiệm thực tế.</p>
+                        {[
+                            ['flaticon-guarantee', 'Tinh chi phi realtime', 'Tong hop ve, luu tru, di chuyen va voucher theo tung lich trinh.'],
+                            ['flaticon-like', 'Clone lich trinh', 'Sao chep itinerary cong khai tu cong dong roi chinh lai theo ngay nghi cua ban.'],
+                            ['flaticon-detective', 'Tim kiem tap trung', 'Loc dia diem, dich vu, tinh thanh va rating trong cung mot luong kham pha.'],
+                            ['flaticon-support', 'Quan ly booking', 'Theo doi trang thai dat dich vu, thanh toan va lich su booking.'],
+                        ].map(([icon, title, text]) => (
+                            <div className="col-md-3 d-flex align-self-stretch ftco-animate" key={title}>
+                                <div className="media block-6 services d-block text-center">
+                                    <div className="d-flex justify-content-center">
+                                        <div className="icon"><span className={icon}></span></div>
+                                    </div>
+                                    <div className="media-body p-2 mt-2">
+                                        <h3 className="heading mb-3">{title}</h3>
+                                        <p>{text}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="col-md-3 d-flex align-self-stretch ftco-animate">
-                            <div className="media block-6 services d-block text-center">
-                                <div className="d-flex justify-content-center">
-                                    <div className="icon"><span className="flaticon-detective"></span></div>
-                                </div>
-                                <div className="media-body p-2 mt-2">
-                                    <h3 className="heading mb-3">Đại lý tận tâm</h3>
-                                    <p>Đội ngũ hỗ trợ nhiệt tình, giải đáp mọi thắc mắc 24/7.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-3 d-flex align-self-stretch ftco-animate">
-                            <div className="media block-6 services d-block text-center">
-                                <div className="d-flex justify-content-center">
-                                    <div className="icon"><span className="flaticon-support"></span></div>
-                                </div>
-                                <div className="media-body p-2 mt-2">
-                                    <h3 className="heading mb-3">Hỗ trợ 24/7</h3>
-                                    <p>Luôn đồng hành cùng bạn trên mọi nẻo đường khám phá.</p>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -118,34 +109,31 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start mb-5 pb-3">
                         <div className="col-md-7 heading-section ftco-animate">
-                            <span className="subheading">Vẻ đẹp tự nhiên</span>
-                            <h2 className="mb-4"><strong>Điểm đến</strong> nổi bật</h2>
+                            <span className="subheading">Search & Discovery</span>
+                            <h2 className="mb-4"><strong>Diem den</strong> noi bat</h2>
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-md-12">
-                            <div className="destination-slider owl-carousel ftco-animate">
-                                {[1, 2, 3, 4, 5, 6].map((i) => (
-                                    <div className="item" key={i}>
-                                        <div className="destination">
-                                            <a
-                                                href="#"
-                                                className="img d-flex justify-content-center align-items-center"
-                                                style={{ backgroundImage: `url(/images/destination-${i}.jpg)` }}
-                                            >
-                                                <div className="icon d-flex justify-content-center align-items-center">
-                                                    <span className="icon-search2"></span>
-                                                </div>
-                                            </a>
-                                            <div className="text p-3">
-                                                <h3><a href="#">{i === 1 ? "Paris, Italy" : i === 2 ? "San Francisco, USA" : i === 3 ? "London, UK" : "Destination"}</a></h3>
-                                                <span className="listing">15 Listing</span>
-                                            </div>
+                        {destinations.map((place) => (
+                            <div className="col-md-4 ftco-animate" key={place.id}>
+                                <div className="destination">
+                                    <Link
+                                        to="/tours"
+                                        className="img d-flex justify-content-center align-items-center"
+                                        style={{ backgroundImage: `url(${place.image})` }}
+                                    >
+                                        <div className="icon d-flex justify-content-center align-items-center">
+                                            <span className="icon-search2"></span>
                                         </div>
+                                    </Link>
+                                    <div className="text p-3">
+                                        <h3><Link to="/tours">{place.name}</Link></h3>
+                                        <span className="listing">{place.listingCount} dich vu</span>
+                                        <p className="mt-2">{place.description}</p>
                                     </div>
-                                ))}
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -154,48 +142,39 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start mb-5 pb-3">
                         <div className="col-md-7 heading-section ftco-animate">
-                            <span className="subheading">Lộ trình phổ biến</span>
-                            <h2 className="mb-4"><strong>Lộ trình</strong> tự túc hàng đầu</h2>
+                            <span className="subheading">Trip Planning</span>
+                            <h2 className="mb-4"><strong>Lich trinh</strong> tu tuc hang dau</h2>
                         </div>
                     </div>
-                </div>
-                <div className="container-fluid">
-                    <div className="row destination-slider owl-carousel">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div className="item" key={i}>
+                    <div className="row">
+                        {topTrips.map((trip) => (
+                            <div className="col-md-6 col-lg-4 ftco-animate" key={trip.id}>
                                 <div className="destination">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="/tours"
                                         className="img img-2 d-flex justify-content-center align-items-center"
-                                        style={{ backgroundImage: `url(/images/destination-${i}.jpg)` }}
+                                        style={{ backgroundImage: `url(${trip.image})` }}
                                     >
                                         <div className="icon d-flex justify-content-center align-items-center">
                                             <span className="icon-search2"></span>
                                         </div>
-                                    </a>
+                                    </Link>
                                     <div className="text p-3">
                                         <div className="d-flex">
                                             <div className="one">
-                                                <h3><a href="#">Lộ trình {i}</a></h3>
-                                                <p className="rate">
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star-o"></i>
-                                                    <span>8 Rating</span>
-                                                </p>
+                                                <h3><Link to="/tours">{trip.title}</Link></h3>
+                                                <Rating value={trip.rating} reviews={trip.reviews} />
                                             </div>
                                             <div className="two">
-                                                <span className="price">$200</span>
+                                                <span className="price">{formatCompactCurrency(trip.budget)}</span>
                                             </div>
                                         </div>
-                                        <p>Chia sẻ kinh nghiệm du lịch tự túc từ cộng đồng.</p>
-                                        <p className="days"><span>2 days 3 nights</span></p>
+                                        <p>{trip.description}</p>
+                                        <p className="days"><span>{trip.days} ngay {trip.nights} dem</span></p>
                                         <hr />
                                         <p className="bottom-area d-flex">
-                                            <span><i className="icon-map-o"></i> Việt Nam</span>
-                                            <span className="ml-auto"><a href="#">Khám phá</a></span>
+                                            <span><i className="icon-map-o"></i> {trip.destination}</span>
+                                            <span className="ml-auto"><Link to="/tours">Clone</Link></span>
                                         </p>
                                     </div>
                                 </div>
@@ -213,47 +192,21 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-center mb-5 pb-3">
                         <div className="col-md-7 text-center heading-section heading-section-white ftco-animate">
-                            <h2 className="mb-4">Thống kê ấn tượng</h2>
-                            <span className="subheading">Hơn 100,000 khách hàng hài lòng</span>
+                            <h2 className="mb-4">Du lieu van hanh</h2>
+                            <span className="subheading">Thong ke mau theo UC024 Dashboard</span>
                         </div>
                     </div>
                     <div className="row justify-content-center">
-                        <div className="col-md-10">
-                            <div className="row">
-                                <div className="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                                    <div className="block-18 text-center">
-                                        <div className="text">
-                                            <strong className="number" data-number="100000">0</strong>
-                                            <span>Khách hàng</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                                    <div className="block-18 text-center">
-                                        <div className="text">
-                                            <strong className="number" data-number="40000">0</strong>
-                                            <span>Điểm đến</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                                    <div className="block-18 text-center">
-                                        <div className="text">
-                                            <strong className="number" data-number="87000">0</strong>
-                                            <span>Khách sạn</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-3 d-flex justify-content-center counter-wrap ftco-animate">
-                                    <div className="block-18 text-center">
-                                        <div className="text">
-                                            <strong className="number" data-number="56400">0</strong>
-                                            <span>Nhà hàng</span>
-                                        </div>
+                        {counters.map((item) => (
+                            <div className="col-md-3 d-flex justify-content-center counter-wrap ftco-animate" key={item.label}>
+                                <div className="block-18 text-center">
+                                    <div className="text">
+                                        <strong className="number">{item.value}</strong>
+                                        <span>{item.label}</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -262,47 +215,38 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start mb-5 pb-3">
                         <div className="col-md-7 heading-section ftco-animate">
-                            <span className="subheading">Ưu đãi đặc biệt</span>
-                            <h2 className="mb-4"><strong>Khách sạn</strong> &amp; Chỗ ở phổ biến</h2>
+                            <span className="subheading">Booking</span>
+                            <h2 className="mb-4"><strong>Khach san</strong> &amp; cho o pho bien</h2>
                         </div>
                     </div>
-                </div>
-                <div className="container-fluid">
-                    <div className="row destination-slider owl-carousel">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div className="item" key={i}>
+                    <div className="row">
+                        {featuredHotels.map((hotel) => (
+                            <div className="col-md-6 col-lg-4 ftco-animate" key={hotel.id}>
                                 <div className="destination">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="/hotels"
                                         className="img img-2 d-flex justify-content-center align-items-center"
-                                        style={{ backgroundImage: `url(/images/hotel-${i}.jpg)` }}
+                                        style={{ backgroundImage: `url(${hotel.image})` }}
                                     >
                                         <div className="icon d-flex justify-content-center align-items-center">
                                             <span className="icon-search2"></span>
                                         </div>
-                                    </a>
+                                    </Link>
                                     <div className="text p-3">
                                         <div className="d-flex">
                                             <div className="one">
-                                                <h3><a href="#">Khách sạn {i}</a></h3>
-                                                <p className="rate">
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star"></i>
-                                                    <i className="icon-star-o"></i>
-                                                    <span>8 Rating</span>
-                                                </p>
+                                                <h3><Link to="/hotels">{hotel.name}</Link></h3>
+                                                <Rating value={hotel.rating} reviews={hotel.reviews} />
                                             </div>
                                             <div className="two">
-                                                <span className="price per-price">$40<br /><small>/đêm</small></span>
+                                                <span className="price per-price">{formatCompactCurrency(hotel.price)}<br /><small>/{hotel.unit}</small></span>
                                             </div>
                                         </div>
-                                        <p>Chỗ ở sạch sẽ, tiện nghi và gần trung tâm.</p>
+                                        <p>{hotel.description}</p>
                                         <hr />
                                         <p className="bottom-area d-flex">
-                                            <span><i className="icon-map-o"></i> Việt Nam</span>
-                                            <span className="ml-auto"><a href="#">Đặt ngay</a></span>
+                                            <span><i className="icon-map-o"></i> {hotel.province}</span>
+                                            <span className="ml-auto"><Link to="/hotels">Dat ngay</Link></span>
                                         </p>
                                     </div>
                                 </div>
@@ -316,31 +260,27 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start">
                         <div className="col-md-8 heading-section ftco-animate">
-                            <span className="subheading">Cảm nhận khách hàng</span>
-                            <h2 className="mb-4 pb-3"><strong>Trải nghiệm</strong> thực tế</h2>
+                            <span className="subheading">Community</span>
+                            <h2 className="mb-4 pb-3"><strong>Trai nghiem</strong> thuc te</h2>
                         </div>
                     </div>
-                    <div className="row ftco-animate">
-                        <div className="col-md-12">
-                            <div className="carousel-testimony owl-carousel">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <div className="item" key={i}>
-                                        <div className="testimony-wrap p-4 pb-5">
-                                            <div className="user-img mb-5" style={{ backgroundImage: `url(/images/person_${i}.jpg)` }}>
-                                                <span className="quote d-flex align-items-center justify-content-center">
-                                                    <i className="icon-quote-left"></i>
-                                                </span>
-                                            </div>
-                                            <div className="text">
-                                                <p className="mb-5">Chuyến đi tuyệt vời, lộ trình rất chi tiết và dễ đi.</p>
-                                                <p className="name">Khách hàng {i}</p>
-                                                <span className="position">Phượt thủ</span>
-                                            </div>
-                                        </div>
+                    <div className="row">
+                        {testimonials.map((item) => (
+                            <div className="col-md-3 ftco-animate" key={item.id}>
+                                <div className="testimony-wrap p-4 pb-5">
+                                    <div className="user-img mb-5" style={{ backgroundImage: `url(${item.avatar})` }}>
+                                        <span className="quote d-flex align-items-center justify-content-center">
+                                            <i className="icon-quote-left"></i>
+                                        </span>
                                     </div>
-                                ))}
+                                    <div className="text">
+                                        <p className="mb-5">{item.content}</p>
+                                        <p className="name">{item.name}</p>
+                                        <span className="position">{item.position}</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -349,38 +289,31 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start mb-5 pb-3">
                         <div className="col-md-7 heading-section ftco-animate">
-                            <span className="subheading">Ưu đãi đặc biệt</span>
-                            <h2 className="mb-4"><strong>Nhà hàng</strong> phổ biến</h2>
+                            <span className="subheading">Dich vu lien quan</span>
+                            <h2 className="mb-4"><strong>Nha hang</strong> pho bien</h2>
                         </div>
                     </div>
                     <div className="row">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div className="col-md-6 col-lg-3 ftco-animate" key={i}>
+                        {restaurants.map((restaurant) => (
+                            <div className="col-md-6 col-lg-3 ftco-animate" key={restaurant.id}>
                                 <div className="destination">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to="/hotels"
                                         className="img img-2 d-flex justify-content-center align-items-center"
-                                        style={{ backgroundImage: `url(/images/restaurant-${i}.jpg)` }}
+                                        style={{ backgroundImage: `url(${restaurant.image})` }}
                                     >
                                         <div className="icon d-flex justify-content-center align-items-center">
                                             <span className="icon-search2"></span>
                                         </div>
-                                    </a>
+                                    </Link>
                                     <div className="text p-3">
-                                        <h3><a href="#">Nhà hàng {i}</a></h3>
-                                        <p className="rate">
-                                            <i className="icon-star"></i>
-                                            <i className="icon-star"></i>
-                                            <i className="icon-star"></i>
-                                            <i className="icon-star"></i>
-                                            <i className="icon-star-o"></i>
-                                            <span>8 Rating</span>
-                                        </p>
-                                        <p>Ẩm thực địa phương đặc sắc và đa dạng.</p>
+                                        <h3><Link to="/hotels">{restaurant.name}</Link></h3>
+                                        <Rating value={restaurant.rating} reviews={restaurant.reviews} />
+                                        <p>{restaurant.description}</p>
                                         <hr />
                                         <p className="bottom-area d-flex">
-                                            <span><i className="icon-map-o"></i> Việt Nam</span>
-                                            <span className="ml-auto"><a href="#">Khám phá</a></span>
+                                            <span><i className="icon-map-o"></i> {restaurant.province}</span>
+                                            <span className="ml-auto"><Link to="/hotels">Kham pha</Link></span>
                                         </p>
                                     </div>
                                 </div>
@@ -394,23 +327,23 @@ const Home = () => {
                 <div className="container">
                     <div className="row justify-content-start mb-5 pb-3">
                         <div className="col-md-7 heading-section ftco-animate">
-                            <span className="subheading">Tin tức &amp; Bài viết</span>
-                            <h2 className="mb-4"><strong>Bài viết</strong> mới nhất</h2>
+                            <span className="subheading">Feed cong dong</span>
+                            <h2 className="mb-4"><strong>Bai viet</strong> moi nhat</h2>
                         </div>
                     </div>
                     <div className="row d-flex">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div className="col-md-3 d-flex ftco-animate" key={i}>
+                        {latestFeeds.map((post) => (
+                            <div className="col-md-3 d-flex ftco-animate" key={post.id}>
                                 <div className="blog-entry align-self-stretch">
-                                    <a href="blog-single.html" className="block-20" style={{ backgroundImage: `url(/images/image_${i}.jpg)` }}>
-                                    </a>
+                                    <Link to="/blog-single" className="block-20" style={{ backgroundImage: `url(${post.image})` }}></Link>
                                     <div className="text p-4 d-block">
-                                        <span className="tag">Kinh nghiệm</span>
-                                        <h3 className="heading mt-3"><a href="#">8 Cách Tiết Kiệm Chi Phí Khi Du Lịch Tự Túc</a></h3>
+                                        <span className="tag">{post.tag}</span>
+                                        <h3 className="heading mt-3"><Link to="/blog-single">{post.title}</Link></h3>
+                                        <p>{post.description}</p>
                                         <div className="meta mb-3">
-                                            <div><a href="#">May 5, 2026</a></div>
-                                            <div><a href="#">Admin</a></div>
-                                            <div><a href="#" className="meta-chat"><span className="icon-chat"></span> 3</a></div>
+                                            <div><Link to="/blog">{formatDate(post.date)}</Link></div>
+                                            <div><Link to="/blog">{post.author}</Link></div>
+                                            <div><Link to="/blog" className="meta-chat"><span className="icon-chat"></span> {post.comments}</Link></div>
                                         </div>
                                     </div>
                                 </div>
@@ -421,30 +354,13 @@ const Home = () => {
             </section>
 
             <section className="ftco-section-parallax">
-                <div className="parallax-img d-flex align-items-center" style={{ background: "linear-gradient(45deg, #2ecc71, #3498db)", padding: "100px 0" }}>
+                <div className="parallax-img d-flex align-items-center" style={{ background: 'linear-gradient(45deg, #2ecc71, #3498db)', padding: '100px 0' }}>
                     <div className="container">
                         <div className="row d-flex justify-content-center">
                             <div className="col-md-7 text-center heading-section heading-section-white ftco-animate">
-                                <h2>Đăng ký nhận tin</h2>
-                                <p>Nhận thông báo về các lộ trình mới nhất và ưu đãi đặc biệt từ ezTravel.</p>
-                                <div className="row d-flex justify-content-center mt-5">
-                                    <div className="col-md-8">
-                                        <form action="#" className="subscribe-form">
-                                            <div className="form-group d-flex">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Địa chỉ email của bạn"
-                                                />
-                                                <input
-                                                    type="submit"
-                                                    value="Đăng ký"
-                                                    className="submit px-3"
-                                                />
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                                <h2>Bat dau lap ke hoach</h2>
+                                <p>Chi phi goi y cho lich trinh pho bien tu {formatCurrency(Math.min(...trips.map((trip) => trip.budget)))}.</p>
+                                <p><Link to="/tours" className="btn btn-primary py-3 px-5">Xem lich trinh</Link></p>
                             </div>
                         </div>
                     </div>

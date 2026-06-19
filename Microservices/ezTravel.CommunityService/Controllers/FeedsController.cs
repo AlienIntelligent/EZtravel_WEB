@@ -17,15 +17,27 @@ public class FeedsController : ControllerBase
         _communityService = communityService;
     }
 
-    [HttpGet("trips")]
-    public async Task<IActionResult> GetPublicTrips([FromQuery] string? keyword)
-        => Ok(await _communityService.GetPublicTripsAsync(keyword));
+    [HttpGet]
+    public async Task<IActionResult> GetFeeds()
+        => Ok(await _communityService.GetFeedsAsync());
 
-    [HttpPost("trips/{id}/visibility")]
+    [HttpPost("{tripId}/like")]
     [Authorize]
-    public async Task<IActionResult> ToggleVisibility(int id, [FromBody] bool isPublic)
+    public async Task<IActionResult> LikeTrip(int tripId)
     {
-        var userId = int.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? "0");
-        return Ok(await _communityService.ToggleTripVisibilityAsync(id, isPublic, userId));
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        return Ok(await _communityService.LikeTripAsync(userId, tripId));
     }
+
+    [HttpPost("{tripId}/comment")]
+    [Authorize]
+    public async Task<IActionResult> CommentOnTrip(int tripId, [FromBody] string content)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        return Ok(await _communityService.CommentOnTripAsync(userId, tripId, content));
+    }
+
+    [HttpGet("{tripId}/comments")]
+    public async Task<IActionResult> GetComments(int tripId)
+        => Ok(await _communityService.GetTripCommentsAsync(tripId));
 }

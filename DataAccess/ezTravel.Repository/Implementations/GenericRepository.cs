@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using ezTravel.Libs;
 using ezTravel.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +35,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         => predicate == null
             ? await _dbSet.CountAsync()
             : await _dbSet.CountAsync(predicate);
+
+    public IQueryable<T> GetQueryable() => _dbSet.AsQueryable();
 
     public async Task<(IEnumerable<T> Items, int Total)> GetPagedAsync(
         int page,
@@ -81,4 +83,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public void RemoveRange(IEnumerable<T> entities)
         => _dbSet.RemoveRange(entities);
+
+    public void Delete(T entity) => Remove(entity);
+    public void DeleteRange(IEnumerable<T> entities) => RemoveRange(entities);
 }

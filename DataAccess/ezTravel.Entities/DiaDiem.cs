@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 
@@ -30,6 +30,9 @@ public class DiaDiem
     [StringLength(100)]
     public string? QuocGia { get; set; }
 
+    [Column("ma_loai_dia_diem")]
+    public int? MaLoaiDiaDiem { get; set; }
+
     [Column("toa_do")]
     public Geometry? ToaDo { get; set; }
 
@@ -40,6 +43,9 @@ public class DiaDiem
     public bool DaXoa { get; set; } = false;
 
     // Navigation
+    [ForeignKey(nameof(MaLoaiDiaDiem))]
+    public virtual LoaiDiaDiem? LoaiDiaDiem { get; set; }
+
     public virtual ICollection<DichVu> DichVus { get; set; } = new List<DichVu>();
     public virtual ICollection<ChiTietLichTrinh> ChiTietLichTrinhs { get; set; } = new List<ChiTietLichTrinh>();
     public virtual ICollection<DanhGia> DanhGias { get; set; } = new List<DanhGia>();

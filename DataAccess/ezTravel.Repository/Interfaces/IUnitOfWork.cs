@@ -1,4 +1,4 @@
-﻿using ezTravel.Entities;
+using ezTravel.Entities;
 
 namespace ezTravel.Repository.Interfaces;
 
@@ -16,6 +16,10 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<MaGiamGia>       MaGiamGias       { get; }
     IGenericRepository<ThanhToan>       ThanhToans       { get; }
     IGenericRepository<HinhAnh>         HinhAnhs         { get; }
+    IGenericRepository<LoaiDiaDiem>     LoaiDiaDiems     { get; }
+    IGenericRepository<BinhLuan>        BinhLuans        { get; }
+    IGenericRepository<LuotThich>       LuotThichs       { get; }
+    IGenericRepository<ThongBao>        ThongBaos        { get; }
 
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

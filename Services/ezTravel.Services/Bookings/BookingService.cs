@@ -41,8 +41,8 @@ public class BookingService : IBookingService
                     MaDon = booking.MaDon,
                     MaDichVu = service.MaDichVu,
                     SoLuong = item.Quantity,
-                    DonGia = service.GiaCoBan,
-                    ThanhTien = service.GiaCoBan * item.Quantity
+                    DonGia = service.GiaTien,
+                    ThanhTien = service.GiaTien * item.Quantity
                 };
                 totalAmount += detail.ThanhTien;
                 await _uow.ChiTietDonDats.AddAsync(detail);
@@ -52,7 +52,7 @@ public class BookingService : IBookingService
             if (request.VoucherId.HasValue)
             {
                 var voucher = await _uow.MaGiamGias.GetByIdAsync(request.VoucherId.Value);
-                if (voucher != null && voucher.NgayHetHan >= DateTime.UtcNow && (voucher.SoLuongToiDa == null || voucher.SoLuongDaDung < voucher.SoLuongToiDa))
+                if (voucher != null && voucher.NgayHetHan >= DateOnly.FromDateTime(DateTime.UtcNow) && (voucher.SoLuongToiDa == null || voucher.SoLuongDaDung < voucher.SoLuongToiDa))
                 {
                     // Basic discount logic (assuming fixed amount for simplicity, can be expanded to percentage)
                     // If your MaGiamGia entity has specific discount fields, use them here.

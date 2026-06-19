@@ -30,7 +30,13 @@ public class PlaceService : IPlaceService
             query = query.Where(d => d.TinhThanh == request.TinhThanh);
         }
 
+        if (request.CategoryId.HasValue)
+        {
+            query = query.Where(d => d.MaLoaiDiaDiem == request.CategoryId);
+        }
+
         var results = await query
+            .Include(d => d.LoaiDiaDiem)
             .OrderByDescending(d => d.NgayTao)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
@@ -44,7 +50,8 @@ public class PlaceService : IPlaceService
                 QuocGia = d.QuocGia,
                 Latitude = d.ToaDo != null ? d.ToaDo.Coordinate.Y : null,
                 Longitude = d.ToaDo != null ? d.ToaDo.Coordinate.X : null,
-                ThumbnailUrl = d.HinhAnhs.OrderBy(h => h.MaHinhAnh).Select(h => h.DuongDan).FirstOrDefault()
+                ThumbnailUrl = d.HinhAnhs.OrderBy(h => h.MaHinhAnh).Select(h => h.DuongDan).FirstOrDefault(),
+                CategoryName = d.LoaiDiaDiem != null ? d.LoaiDiaDiem.TenLoai : null
             })
             .ToListAsync();
 
@@ -56,6 +63,7 @@ public class PlaceService : IPlaceService
         var place = await _uow.DiaDiems.GetQueryable()
             .Include(d => d.HinhAnhs)
             .Include(d => d.DanhGias)
+            .Include(d => d.LoaiDiaDiem)
             .FirstOrDefaultAsync(d => d.MaDiaDiem == id && !d.DaXoa);
 
         if (place == null) return null;
@@ -72,8 +80,20 @@ public class PlaceService : IPlaceService
             Longitude = place.ToaDo?.Coordinate.X,
             Images = place.HinhAnhs.Select(h => h.DuongDan).ToList(),
             AverageRating = place.DanhGias.Any() ? place.DanhGias.Average(dg => dg.SoSao) : 0,
-            TotalReviews = place.DanhGias.Count
+            TotalReviews = place.DanhGias.Count,
+            CategoryName = place.LoaiDiaDiem?.TenLoai
         };
+    }
+
+    public async Task<IEnumerable<PlaceCategoryDto>> GetCategoriesAsync()
+    {
+        return await _uow.LoaiDiaDiems.GetQueryable()
+            .Select(c => new PlaceCategoryDto
+            {
+                Id = c.MaLoai,
+                Name = c.TenLoai,
+                Icon = c.BieuTuong
+            }).ToListAsync();
     }
 
     public async Task<IEnumerable<PlaceDto>> GetNearbyPlacesAsync(double lat, double lng, double radiusInKm)

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ezTravel.Entities;
@@ -7,8 +7,8 @@ namespace ezTravel.Entities;
 public class HinhAnh
 {
     [Key]
-    [Column("ma_hinh")]
-    public int MaHinh { get; set; }
+    [Column("ma_hinh_anh")]
+    public int MaHinhAnh { get; set; }
 
     [Column("ma_dich_vu")]
     public int? MaDichVu { get; set; }
@@ -16,9 +16,9 @@ public class HinhAnh
     [Column("ma_dia_diem")]
     public int? MaDiaDiem { get; set; }
 
-    [Column("url")]
+    [Column("duong_dan")]
     [StringLength(255)]
-    public string Url { get; set; } = null!;
+    public string DuongDan { get; set; } = null!;
 
     // Navigation
     [ForeignKey(nameof(MaDiaDiem))]

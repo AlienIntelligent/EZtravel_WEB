@@ -1,137 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { productApi, userApi, categoryApi } from '../../api';
-import useAuthStore from '../../store/authStore';
+import React from 'react';
+import {
+    adminStats,
+    bookings,
+    communityFeeds,
+    destinations,
+    formatCompactCurrency,
+    formatCurrency,
+    trips,
+} from '../../data/usecaseData';
 
 const Dashboard = () => {
-    const [stats, setStats] = useState({
-        products: 0,
-        categories: 0,
-        users: 0,
-    });
-    const [loading, setLoading] = useState(true);
-    const { isAdmin } = useAuthStore();
-
-    useEffect(() => {
-        loadStats();
-    }, []);
-
-    const loadStats = async () => {
-        try {
-            const [productsRes, categoriesRes] = await Promise.allSettled([
-                productApi.getAll(),
-                categoryApi.getAll(),
-            ]);
-
-            let usersCount = 0;
-            if (isAdmin()) {
-                try {
-                    const usersRes = await userApi.getAll({ page: 1, pageSize: 1 });
-                    usersCount = usersRes.value?.data?.totalCount || 0;
-                } catch (e) {
-                    console.log('Cannot fetch users count');
-                }
-            }
-
-            setStats({
-                products: productsRes.value?.data?.totalCount || productsRes.value?.data?.items?.length || productsRes.value?.data?.length || 0,
-                categories: categoriesRes.value?.data?.length || 0,
-                users: usersCount,
-            });
-        } catch (error) {
-            console.error('Failed to load stats:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
-        <div className="content-wrapper">
-            <div className="content-header">
-                <div className="container-fluid">
-                    <div className="row mb-2">
-                        <div className="col-sm-6">
-                            <h1 className="m-0">Dashboard</h1>
+        <div className="container-fluid">
+            <div className="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 className="h3 mb-0 text-gray-800">Dashboard thong ke</h1>
+                <span className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">UC024 Analytics</span>
+            </div>
+
+            <div className="row">
+                {adminStats.map((stat) => (
+                    <div className="col-xl-3 col-md-6 mb-4" key={stat.id}>
+                        <div className="card border-left-primary shadow h-100 py-2">
+                            <div className="card-body">
+                                <div className="row no-gutters align-items-center">
+                                    <div className="col mr-2">
+                                        <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">{stat.label}</div>
+                                        <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                            {stat.id === 'revenue' ? formatCompactCurrency(stat.value) : stat.value}
+                                        </div>
+                                        <div className="small text-success">{stat.trend} so voi thang truoc</div>
+                                    </div>
+                                    <div className="col-auto">
+                                        <i className={`${stat.icon} fa-2x text-gray-300`}></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="row">
+                <div className="col-lg-7 mb-4">
+                    <div className="card shadow mb-4">
+                        <div className="card-header py-3">
+                            <h6 className="m-0 font-weight-bold text-primary">Booking gan day</h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="table-responsive">
+                                <table className="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Dich vu</th>
+                                            <th>Khach hang</th>
+                                            <th>Trang thai</th>
+                                            <th>So tien</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {bookings.map((booking) => (
+                                            <tr key={booking.id}>
+                                                <td>{booking.serviceName}</td>
+                                                <td>{booking.customer}</td>
+                                                <td><span className="badge badge-info">{booking.status}</span></td>
+                                                <td>{formatCurrency(booking.amount)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-lg-5 mb-4">
+                    <div className="card shadow mb-4">
+                        <div className="card-header py-3">
+                            <h6 className="m-0 font-weight-bold text-primary">Diem den hot</h6>
+                        </div>
+                        <div className="card-body">
+                            {destinations.slice(0, 5).map((place) => (
+                                <div className="mb-3" key={place.id}>
+                                    <div className="d-flex justify-content-between">
+                                        <strong>{place.name}</strong>
+                                        <span>{place.rating}/5</span>
+                                    </div>
+                                    <div className="small text-muted">{place.province} - {place.listingCount} dich vu</div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <section className="content">
-                <div className="container-fluid">
-                    {loading ? (
-                        <div className="text-center py-5">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </div>
+            <div className="row">
+                <div className="col-lg-6 mb-4">
+                    <div className="card shadow">
+                        <div className="card-header py-3">
+                            <h6 className="m-0 font-weight-bold text-primary">Trip public moi</h6>
                         </div>
-                    ) : (
-                        <div className="row">
-                            <div className="col-lg-3 col-6">
-                                <div className="small-box bg-info">
-                                    <div className="inner">
-                                        <h3>{stats.products}</h3>
-                                        <p>Places</p>
-                                    </div>
-                                    <div className="icon">
-                                        <i className="fas fa-map-marker-alt"></i>
-                                    </div>
-                                    <a href="/products" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="col-lg-3 col-6">
-                                <div className="small-box bg-success">
-                                    <div className="inner">
-                                        <h3>{stats.categories}</h3>
-                                        <p>Categories</p>
-                                    </div>
-                                    <div className="icon">
-                                        <i className="fas fa-tags"></i>
-                                    </div>
-                                    <a href="/categories" className="small-box-footer">
-                                        More info <i className="fas fa-arrow-circle-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            {isAdmin() && (
-                                <div className="col-lg-3 col-6">
-                                    <div className="small-box bg-warning">
-                                        <div className="inner">
-                                            <h3>{stats.users}</h3>
-                                            <p>Users</p>
-                                        </div>
-                                        <div className="icon">
-                                            <i className="fas fa-users"></i>
-                                        </div>
-                                        <a href="/users" className="small-box-footer">
-                                            More info <i className="fas fa-arrow-circle-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="row">
-                        <div className="col-12">
-                            <div className="card">
-                                <div className="card-header">
-                                    <h3 className="card-title">Welcome to ezTravel System</h3>
-                                </div>
-                                <div className="card-body">
-                                    <p>Hệ thống quản lý du lịch tự túc chuyên nghiệp.</p>
-                                    <ul>
-                                        <li><strong>Backend:</strong> .NET Core 8.0 Microservices</li>
-                                        <li><strong>Frontend:</strong> React 18</li>
-                                        <li><strong>UI:</strong> AdminLTE 3 / Minimalist</li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div className="card-body">
+                            {trips.filter((trip) => trip.status === 'Cong khai').slice(0, 4).map((trip) => (
+                                <p key={trip.id} className="mb-2">{trip.title} - {trip.destination}</p>
+                            ))}
                         </div>
                     </div>
                 </div>
-            </section>
+                <div className="col-lg-6 mb-4">
+                    <div className="card shadow">
+                        <div className="card-header py-3">
+                            <h6 className="m-0 font-weight-bold text-primary">Noi dung can kiem duyet</h6>
+                        </div>
+                        <div className="card-body">
+                            {communityFeeds.map((feed) => (
+                                <p key={feed.id} className="mb-2">{feed.title} <span className="badge badge-light">{feed.tag}</span></p>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

@@ -29,4 +29,8 @@ public class PlacesController : ControllerBase
     [HttpGet("nearby")]
     public async Task<IActionResult> GetNearby([FromQuery] double lat, [FromQuery] double lng, [FromQuery] double radius = 5)
         => Ok(await _placeService.GetNearbyPlacesAsync(lat, lng, radius));
+
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+        => Ok(await _placeService.GetCategoriesAsync());
 }

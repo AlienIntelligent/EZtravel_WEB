@@ -20,6 +20,10 @@ public class AppDbContext : DbContext
     public DbSet<MaGiamGia> MaGiamGias { get; set; }
     public DbSet<ThanhToan> ThanhToans { get; set; }
     public DbSet<HinhAnh> HinhAnhs { get; set; }
+    public DbSet<LoaiDiaDiem> LoaiDiaDiems { get; set; }
+    public DbSet<BinhLuan> BinhLuans { get; set; }
+    public DbSet<LuotThich> LuotThichs { get; set; }
+    public DbSet<ThongBao> ThongBaos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -178,6 +182,46 @@ public class AppDbContext : DbContext
              .WithMany(x => x.HinhAnhs)
              .HasForeignKey(x => x.MaDichVu)
              .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ── BinhLuan ──
+        modelBuilder.Entity<BinhLuan>(e =>
+        {
+            e.HasOne(x => x.NguoiDung)
+             .WithMany()
+             .HasForeignKey(x => x.MaNguoiDung)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.LichTrinh)
+             .WithMany()
+             .HasForeignKey(x => x.MaLichTrinh)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── LuotThich ──
+        modelBuilder.Entity<LuotThich>(e =>
+        {
+            e.HasKey(x => new { x.MaNguoiDung, x.MaLichTrinh });
+
+            e.HasOne(x => x.NguoiDung)
+             .WithMany()
+             .HasForeignKey(x => x.MaNguoiDung)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(x => x.LichTrinh)
+             .WithMany()
+             .HasForeignKey(x => x.MaLichTrinh)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── ThongBao ──
+        modelBuilder.Entity<ThongBao>(e =>
+        {
+            e.Property(x => x.NgayTao).HasDefaultValueSql("GETUTCDATE()");
+            e.HasOne(x => x.NguoiDung)
+             .WithMany()
+             .HasForeignKey(x => x.MaNguoiDung)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ── Soft delete filter (tự động lọc bản ghi đã xóa) ──

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ezTravel.Entities;
@@ -23,8 +23,8 @@ public class DichVu
     [Column("mo_ta")]
     public string? MoTa { get; set; }
 
-    [Column("gia_co_ban", TypeName = "decimal(15,2)")]
-    public decimal GiaCoBan { get; set; }
+    [Column("gia_tien", TypeName = "decimal(15,2)")]
+    public decimal GiaTien { get; set; }
 
     [Column("so_luong_toi_da")]
     public int? SoLuongToiDa { get; set; }

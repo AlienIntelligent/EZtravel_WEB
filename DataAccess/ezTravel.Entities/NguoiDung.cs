@@ -31,9 +31,9 @@ public class NguoiDung
     [Column("ngay_sinh")]
     public DateOnly? NgaySinh { get; set; }
 
-    [Column("anh_dai_dien")]
+    [Column("avatar")]
     [StringLength(255)]
-    public string? AnhDaiDien { get; set; }
+    public string? Avatar { get; set; }
 
     [Column("vai_tro")]
     [StringLength(20)]

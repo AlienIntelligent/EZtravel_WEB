@@ -11,6 +11,7 @@ public class PlaceDto
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
     public string? ThumbnailUrl { get; set; }
+    public string? CategoryName { get; set; }
 }
 
 public class PlaceDetailDto : PlaceDto
@@ -24,6 +25,7 @@ public class PlaceSearchRequest
 {
     public string? Keyword { get; set; }
     public string? TinhThanh { get; set; }
+    public int? CategoryId { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

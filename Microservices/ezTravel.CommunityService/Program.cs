@@ -3,7 +3,6 @@ using ezTravel.Repository;
 using ezTravel.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +13,7 @@ builder.Services.AddServices();
 // 2. Add Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ezTravel Community Service API", Version = "v1" });
-});
+builder.Services.AddSwaggerGen();
 
 // 3. Add Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

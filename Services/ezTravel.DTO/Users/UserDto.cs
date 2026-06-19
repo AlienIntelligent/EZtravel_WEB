@@ -6,7 +6,7 @@ public class UserDto
     public string HoTen { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? Role { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
     public bool IsLocked { get; set; }
 }
 

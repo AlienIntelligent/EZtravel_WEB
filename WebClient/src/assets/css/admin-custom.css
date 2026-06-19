@@ -24,11 +24,86 @@ body {
     sans-serif !important;
 }
 
+body.admin-layout {
+  overflow-x: hidden;
+}
+
+.admin-shell {
+  min-height: 100vh;
+}
+
+.admin-shell .main-header,
+.admin-shell .content-wrapper,
+.admin-shell .main-footer {
+  margin-left: 250px !important;
+  transition: margin-left 0.25s ease-in-out !important;
+}
+
+.admin-shell.sidebar-collapsed .main-header,
+.admin-shell.sidebar-collapsed .content-wrapper,
+.admin-shell.sidebar-collapsed .main-footer {
+  margin-left: 4.6rem !important;
+}
+
+.admin-shell .main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.admin-shell .main-header .nav-link {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-shell .main-header button.nav-link {
+  height: 2.5rem;
+  padding: 0 1rem;
+}
+
 /* Sidebar */
 .main-sidebar {
   background-color: var(--sidebar-bg) !important;
   box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.1) !important;
   border-right: none !important;
+  width: 250px !important;
+  transition:
+    width 0.25s ease-in-out,
+    transform 0.25s ease-in-out !important;
+  z-index: 1040 !important;
+}
+
+.admin-shell.sidebar-collapsed .main-sidebar {
+  width: 4.6rem !important;
+}
+
+.admin-shell.sidebar-collapsed .brand-link {
+  justify-content: center;
+  min-height: 57px;
+}
+
+.admin-shell.sidebar-collapsed .brand-text,
+.admin-shell.sidebar-collapsed .nav-sidebar .nav-link p {
+  display: none !important;
+}
+
+.admin-shell.sidebar-collapsed .nav-sidebar .nav-link {
+  text-align: center;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.admin-shell.sidebar-collapsed .nav-sidebar .nav-icon {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+}
+
+.brand-link,
+.nav-sidebar .nav-link {
+  white-space: nowrap;
 }
 
 .nav-sidebar .nav-item .nav-link.active {
@@ -41,6 +116,7 @@ body {
 .content-wrapper {
   background-color: var(--bg-main) !important;
   padding: 1rem 1.5rem !important;
+  min-height: calc(100vh - 114px) !important;
 }
 
 /* Card */
@@ -49,4 +125,43 @@ body {
   border: 1px solid #f1f5f9 !important;
   box-shadow: var(--card-shadow) !important;
   background: #fff !important;
+}
+
+.main-footer {
+  background: #fff !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+@media (max-width: 991.98px) {
+  .admin-shell .main-header,
+  .admin-shell .content-wrapper,
+  .admin-shell .main-footer,
+  .admin-shell.sidebar-collapsed .main-header,
+  .admin-shell.sidebar-collapsed .content-wrapper,
+  .admin-shell.sidebar-collapsed .main-footer {
+    margin-left: 0 !important;
+  }
+
+  .admin-shell .main-sidebar {
+    transform: translateX(0);
+    width: 250px !important;
+  }
+
+  .admin-shell.sidebar-collapsed .main-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-shell.sidebar-collapsed .brand-text,
+  .admin-shell.sidebar-collapsed .nav-sidebar .nav-link p {
+    display: inline-block !important;
+  }
+
+  .admin-shell.sidebar-collapsed .nav-sidebar .nav-link {
+    text-align: left;
+  }
+
+  .admin-shell.sidebar-collapsed .nav-sidebar .nav-icon {
+    margin-right: 0.2rem !important;
+    width: 1.6rem !important;
+  }
 }

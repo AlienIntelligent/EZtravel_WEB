@@ -1,16 +1,16 @@
+using ezTravel.DTO.Community;
 using ezTravel.DTO.Reviews;
-using ezTravel.DTO.Trips;
 
 namespace ezTravel.Services.Community;
 
 public interface ICommunityService
 {
-    // Reviews
-    Task<ReviewDto> PostReviewAsync(CreateReviewRequest request, int userId);
-    Task<IEnumerable<ReviewDto>> GetPlaceReviewsAsync(int placeId);
-    Task<IEnumerable<ReviewDto>> GetServiceReviewsAsync(int serviceId);
+    Task<IEnumerable<FeedDto>> GetFeedsAsync();
+    Task<bool> LikeTripAsync(int userId, int tripId);
+    Task<bool> CommentOnTripAsync(int userId, int tripId, string content);
+    Task<IEnumerable<CommentDto>> GetTripCommentsAsync(int tripId);
     
-    // Sharing
-    Task<IEnumerable<TripDto>> GetPublicTripsAsync(string? keyword = null);
-    Task<bool> ToggleTripVisibilityAsync(int tripId, bool isPublic, int userId);
+    Task<ReviewDto> PostReviewAsync(CreateReviewRequest request, int userId);
+    Task<IEnumerable<ReviewDto>> GetPlaceReviewsAsync(int id);
+    Task<IEnumerable<ReviewDto>> GetServiceReviewsAsync(int id);
 }

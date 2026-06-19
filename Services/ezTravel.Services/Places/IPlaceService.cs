@@ -7,4 +7,5 @@ public interface IPlaceService
     Task<IEnumerable<PlaceDto>> SearchPlacesAsync(PlaceSearchRequest request);
     Task<PlaceDetailDto?> GetPlaceByIdAsync(int id);
     Task<IEnumerable<PlaceDto>> GetNearbyPlacesAsync(double lat, double lng, double radiusInKm);
+    Task<IEnumerable<PlaceCategoryDto>> GetCategoriesAsync();
 }

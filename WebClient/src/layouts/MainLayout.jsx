@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import "../assets/css/admin-custom.css";
@@ -7,45 +7,56 @@ const MainLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuthStore();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 992;
+  });
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
     // Add AdminLTE CSS
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css";
-    link.id = "adminlte-css";
-    document.head.appendChild(link);
+    if (!document.getElementById("adminlte-css")) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css";
+      link.id = "adminlte-css";
+      document.head.appendChild(link);
+    }
 
     // Add FontAwesome
-    const fa = document.createElement("link");
-    fa.rel = "stylesheet";
-    fa.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
-    fa.id = "fa-css";
-    document.head.appendChild(fa);
-    
-    // Add AdminLTE JS
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js";
-    script.id = "adminlte-js";
-    document.body.appendChild(script);
+    if (!document.getElementById("fa-css")) {
+      const fa = document.createElement("link");
+      fa.rel = "stylesheet";
+      fa.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+      fa.id = "fa-css";
+      document.head.appendChild(fa);
+    }
 
     // Add layout class to body
-    document.body.classList.add('sidebar-mini');
+    document.body.classList.add("admin-layout", "layout-fixed", "sidebar-mini");
     
     return () => {
       // Remove AdminLTE CSS & JS
       const existingLink = document.getElementById("adminlte-css");
       if (existingLink) document.head.removeChild(existingLink);
       
-      const existingScript = document.getElementById("adminlte-js");
-      if (existingScript) document.body.removeChild(existingScript);
-
       const existingFa = document.getElementById("fa-css");
       if (existingFa) document.head.removeChild(existingFa);
       
-      document.body.classList.remove('sidebar-mini');
+      document.body.classList.remove("admin-layout", "layout-fixed", "sidebar-mini", "sidebar-collapse");
     };
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("sidebar-collapse", isSidebarCollapsed);
+  }, [isSidebarCollapsed]);
+
+  useEffect(() => {
+    setIsUserMenuOpen(false);
+    if (window.innerWidth < 992) {
+      setIsSidebarCollapsed(true);
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -55,19 +66,20 @@ const MainLayout = ({ children }) => {
   const isActive = (path) => (location.pathname === path ? "active" : "");
 
   return (
-    <div className="wrapper">
+    <div className={`wrapper admin-shell ${isSidebarCollapsed ? "sidebar-collapsed" : "sidebar-expanded"}`}>
       {/* Navbar */}
       <nav className="main-header navbar navbar-expand navbar-white navbar-light">
         <ul className="navbar-nav">
           <li className="nav-item">
-            <a
+            <button
               className="nav-link"
-              data-widget="pushmenu"
-              href="#"
-              role="button"
+              type="button"
+              aria-label="An hien sidebar"
+              aria-expanded={!isSidebarCollapsed}
+              onClick={() => setIsSidebarCollapsed((current) => !current)}
             >
               <i className="fas fa-bars"></i>
-            </a>
+            </button>
           </li>
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/" className="nav-link text-primary font-weight-bold">
@@ -77,11 +89,16 @@ const MainLayout = ({ children }) => {
         </ul>
 
         <ul className="navbar-nav ml-auto">
-          <li className="nav-item dropdown">
-            <a className="nav-link" data-toggle="dropdown" href="#">
+          <li className={`nav-item dropdown ${isUserMenuOpen ? "show" : ""}`}>
+            <button
+              className="nav-link"
+              type="button"
+              aria-expanded={isUserMenuOpen}
+              onClick={() => setIsUserMenuOpen((current) => !current)}
+            >
               <i className="far fa-user"></i> {user?.name || user?.username || 'User'}
-            </a>
-            <div className="dropdown-menu dropdown-menu-right">
+            </button>
+            <div className={`dropdown-menu dropdown-menu-right ${isUserMenuOpen ? "show" : ""}`}>
               <span className="dropdown-item dropdown-header">
                 {user?.email || 'No email'}
               </span>
@@ -153,7 +170,11 @@ const MainLayout = ({ children }) => {
       </aside>
 
       {/* Content */}
-      {children}
+      <div className="content-wrapper">
+        <section className="content">
+          {children}
+        </section>
+      </div>
 
       {/* Footer */}
       <footer className="main-footer">

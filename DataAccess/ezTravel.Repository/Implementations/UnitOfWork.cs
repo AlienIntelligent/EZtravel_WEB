@@ -1,4 +1,4 @@
-﻿using ezTravel.Entities;
+using ezTravel.Entities;
 using ezTravel.Libs;
 using ezTravel.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -23,6 +23,10 @@ public class UnitOfWork : IUnitOfWork
     private IGenericRepository<MaGiamGia>?        _maGiamGias;
     private IGenericRepository<ThanhToan>?        _thanhToans;
     private IGenericRepository<HinhAnh>?          _hinhAnhs;
+    private IGenericRepository<LoaiDiaDiem>?      _loaiDiaDiems;
+    private IGenericRepository<BinhLuan>?         _binhLuans;
+    private IGenericRepository<LuotThich>?        _luotThichs;
+    private IGenericRepository<ThongBao>?         _thongBaos;
 
     public UnitOfWork(AppDbContext context) => _context = context;
 
@@ -38,6 +42,10 @@ public class UnitOfWork : IUnitOfWork
     public IGenericRepository<MaGiamGia>        MaGiamGias        => _maGiamGias        ??= new GenericRepository<MaGiamGia>(_context);
     public IGenericRepository<ThanhToan>        ThanhToans        => _thanhToans        ??= new GenericRepository<ThanhToan>(_context);
     public IGenericRepository<HinhAnh>          HinhAnhs          => _hinhAnhs          ??= new GenericRepository<HinhAnh>(_context);
+    public IGenericRepository<LoaiDiaDiem>      LoaiDiaDiems      => _loaiDiaDiems      ??= new GenericRepository<LoaiDiaDiem>(_context);
+    public IGenericRepository<BinhLuan>         BinhLuans         => _binhLuans         ??= new GenericRepository<BinhLuan>(_context);
+    public IGenericRepository<LuotThich>        LuotThichs        => _luotThichs        ??= new GenericRepository<LuotThich>(_context);
+    public IGenericRepository<ThongBao>         ThongBaos         => _thongBaos         ??= new GenericRepository<ThongBao>(_context);
 
     public async Task<int> SaveChangesAsync()
         => await _context.SaveChangesAsync();

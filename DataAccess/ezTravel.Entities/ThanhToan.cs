@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,9 +15,9 @@ public class ThanhToan
     [Column("ma_don")]
     public int MaDon { get; set; }
 
-    [Column("phuong_thuc")]
+    [Column("phuong_thuc_thanh_toan")]
     [StringLength(20)]
-    public string? PhuongThuc { get; set; }
+    public string? PhuongThucThanhToan { get; set; }
 
     [Column("so_tien", TypeName = "decimal(15,2)")]
     public decimal SoTien { get; set; }
