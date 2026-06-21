@@ -43,7 +43,7 @@ const UserLayout = ({ children }) => {
                     <div className="collapse navbar-collapse" id="ftco-nav">
                         <ul className="navbar-nav ml-auto">
                             <li className="nav-item"><Link to="/" className="nav-link">Trang chủ</Link></li>
-                            <li className="nav-item"><Link to="/tours" className="nav-link">Lộ Trình Tự Túc</Link></li>
+                            <li className="nav-item"><Link to="/itinerary" className="nav-link">Lộ Trình Tự Túc</Link></li>
                             <li className="nav-item"><Link to="/tours" className="nav-link">Điểm Đến</Link></li>
                             <li className="nav-item"><Link to="/hotels" className="nav-link">Nơi Ở</Link></li>
                             <li className="nav-item"><Link to="/blog" className="nav-link">Kinh Nghiệm</Link></li>

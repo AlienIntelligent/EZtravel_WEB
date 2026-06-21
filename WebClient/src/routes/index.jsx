@@ -24,6 +24,7 @@ import About from '../pages/user_pages/About';
 import Contact from '../pages/user_pages/Contact';
 import HotelSingle from '../pages/user_pages/HotelSingle';
 import BlogSingle from '../pages/user_pages/BlogSingle';
+import Itinerary from "../pages/user_pages/Itinerary";
 
 const AppRoutes = () => {
     return (
@@ -97,6 +98,7 @@ const AppRoutes = () => {
                 }
             />
             <Route path="/tours" element={<UserLayout><Tours /></UserLayout>} />
+            <Route path="/itinerary" element={<UserLayout><Itinerary /></UserLayout>} />
             <Route path="/hotels" element={<UserLayout><Hotels /></UserLayout>} />
             <Route path="/hotel-single" element={<UserLayout><HotelSingle /></UserLayout>} />
             <Route path="/blog" element={<UserLayout><Blogs /></UserLayout>} />
