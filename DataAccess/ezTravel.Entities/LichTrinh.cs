@@ -1,58 +1,61 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ezTravel.Entities;
 
-[Table("LICH_TRINH")]
-public class LichTrinh
+public partial class LichTrinh
 {
-    [Key]
-    [Column("ma_lich_trinh")]
     public int MaLichTrinh { get; set; }
 
-    [Column("ma_nguoi_dung")]
     public int MaNguoiDung { get; set; }
 
-    [Column("ten_lich_trinh")]
-    [StringLength(200)]
     public string TenLichTrinh { get; set; } = null!;
 
-    [Column("diem_den")]
-    [StringLength(200)]
-    public string? DiemDen { get; set; }
-
-    [Column("ngay_bat_dau")]
-    public DateOnly NgayBatDau { get; set; }
-
-    [Column("ngay_ket_thuc")]
-    public DateOnly NgayKetThuc { get; set; }
-
-    [Column("so_nguoi")]
-    public int SoNguoi { get; set; } = 1;
-
-    [Column("ngan_sach", TypeName = "decimal(15,2)")]
-    public decimal? NganSach { get; set; }
-
-    [Column("mo_ta")]
     public string? MoTa { get; set; }
 
-    [Column("trang_thai")]
-    [StringLength(20)]
-    public string TrangThai { get; set; } = "Nhap";
+    public string? Thumbnail { get; set; }
 
-    [Column("trang_thai_chia_se")]
-    [StringLength(20)]
-    public string TrangThaiChiaSe { get; set; } = "RiengTu";
+    public DateOnly NgayBatDau { get; set; }
 
-    [Column("ngay_tao", TypeName = "datetime")]
-    public DateTime NgayTao { get; set; } = DateTime.UtcNow;
+    public DateOnly NgayKetThuc { get; set; }
 
-    [Column("da_xoa")]
-    public bool DaXoa { get; set; } = false;
+    public decimal? NganSachToiDa { get; set; }
 
-    // Navigation
-    [ForeignKey(nameof(MaNguoiDung))]
-    public virtual NguoiDung NguoiDung { get; set; } = null!;
+    public decimal TongChiPhiUocTinh { get; set; }
 
-    public virtual ICollection<ChiTietLichTrinh> ChiTietLichTrinhs { get; set; } = new List<ChiTietLichTrinh>();
+    public bool LaCongKhai { get; set; }
+
+    public int LuotXem { get; set; }
+
+    public int LuotThich { get; set; }
+
+    public int LuotClone { get; set; }
+
+    public string TrangThai { get; set; } = null!;
+
+    public DateTime NgayTao { get; set; }
+
+    public DateTime NgayCapNhat { get; set; }
+
+    public virtual ICollection<BaoCaoNoiDung> BaoCaoNoiDung { get; set; } = new List<BaoCaoNoiDung>();
+
+    public virtual ICollection<BinhLuanLichTrinh> BinhLuanLichTrinh { get; set; } = new List<BinhLuanLichTrinh>();
+
+    public virtual ICollection<ChiaSeLichTrinh> ChiaSeLichTrinh { get; set; } = new List<ChiaSeLichTrinh>();
+
+    public virtual ICollection<DanhGia> DanhGia { get; set; } = new List<DanhGia>();
+
+    public virtual ICollection<DuyetNoiDung> DuyetNoiDung { get; set; } = new List<DuyetNoiDung>();
+
+    public virtual ICollection<LichSuClone> LichSuCloneMaLichTrinhGocNavigation { get; set; } = new List<LichSuClone>();
+
+    public virtual ICollection<LichSuClone> LichSuCloneMaLichTrinhMoiNavigation { get; set; } = new List<LichSuClone>();
+
+    public virtual ICollection<LuuLichTrinh> LuuLichTrinh { get; set; } = new List<LuuLichTrinh>();
+
+    public virtual NguoiDung MaNguoiDungNavigation { get; set; } = null!;
+
+    public virtual ICollection<NgayLichTrinh> NgayLichTrinh { get; set; } = new List<NgayLichTrinh>();
+
+    public virtual ICollection<ThichLichTrinh> ThichLichTrinh { get; set; } = new List<ThichLichTrinh>();
 }

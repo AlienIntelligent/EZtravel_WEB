@@ -1,0 +1,138 @@
+import { baseApi } from './baseApi';
+import { Place, Service } from '../shared/types';
+import { ExploreState } from '../store/exploreSlice';
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export const exploreApi = baseApi.injectEndpoints({
+    endpoints: (builder) => ({
+        searchPlaces: builder.query<PaginatedResponse<Place>, Partial<ExploreState>>({
+            query: (filters) => {
+                const params = new URLSearchParams();
+                if (filters.keyword) params.append('keyword', filters.keyword);
+                if (filters.province) params.append('province', filters.province);
+                if (filters.rating) params.append('rating', filters.rating.toString());
+                if (filters.page) params.append('page', filters.page.toString());
+                params.append('pageSize', '12'); // Explore grid page size
+
+                return {
+                    url: `/places/search?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
+            transformResponse: (response: any, meta, arg) => {
+                const sourceData = Array.isArray(response) ? response : (response.data || []);
+                const data = sourceData.map((item: any) => ({
+                    id: item.id?.toString() || '',
+                    name: item.tenDiaDiem || item.name || '',
+                    description: item.moTa || item.description || '',
+                    address: item.diaChi || item.address || '',
+                    cityId: item.maTinhThanh?.toString() || item.cityId || '',
+                    latitude: item.latitude || 0,
+                    longitude: item.longitude || 0,
+                    images: item.thumbnailUrl ? [item.thumbnailUrl] : (item.images || []),
+                    tags: item.tags || [],
+                    averageRating: item.ratingAvg || item.averageRating || 0,
+                    totalReviews: item.totalReviews || item.tongDanhGia || 0,
+                    status: 'ACTIVE' as const,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                }));
+
+                return {
+                    data: data,
+                    total: data.length, // Fallback since backend didn't return total count
+                    page: arg.page || 1,
+                    pageSize: 12,
+                    totalPages: data.length === 12 ? (arg.page || 1) + 1 : (arg.page || 1)
+                };
+            },
+            providesTags: ['Explore'],
+        }),
+        searchServices: builder.query<PaginatedResponse<Service>, Partial<ExploreState>>({
+            queryFn: async (filters, _queryApi, _extraOptions, fetchWithBQ) => {
+                const params = new URLSearchParams();
+                if (filters.keyword) params.append('keyword', filters.keyword);
+                if (filters.province) {
+                    params.append('keyword', filters.province);
+                }
+                if (filters.budgetMax !== undefined) params.append('giaToiDa', filters.budgetMax.toString());
+                if (filters.rating) params.append('soSao', filters.rating.toString());
+                params.append('page', (filters.page || 1).toString());
+                params.append('pageSize', '12');
+
+                const queryStr = params.toString();
+                let results: any[] = [];
+                let total = 0;
+
+                try {
+                    const fetchCategory = async (cat: string) => {
+                        const result = await fetchWithBQ({ url: `/places/${cat}/search?${queryStr}`, method: 'GET' });
+                        const resData: any = result.data || {};
+                        const sourceData = Array.isArray(resData) ? resData : (resData.data || []);
+                        return sourceData.map((item: any) => {
+                            let name = '';
+                            let category = 'ACCOMMODATION';
+                            if (cat === 'hotels') { name = item.tenKhachSan; category = 'ACCOMMODATION'; }
+                            if (cat === 'restaurants') { name = item.tenNhaHang; category = 'FOOD'; }
+                            if (cat === 'activities') { name = item.tenHoatDong; category = 'ACTIVITY'; }
+                            if (cat === 'vehicles') { name = item.tenPhuongTien; category = 'TRANSPORT'; }
+
+                            return {
+                                id: item.id?.toString() || '',
+                                providerId: (item.maNhaCungCap || 0).toString(),
+                                placeId: (item.maDiaDiem || 0).toString(),
+                                name: name,
+                                description: item.moTa || '',
+                                type: category,
+                                price: item.giaTu || item.giaTrungBinh || item.price || 0,
+                                referencePrice: item.giaDen,
+                                images: item.anhDaiDien ? [item.anhDaiDien] : [],
+                                averageRating: item.ratingAvg || 0,
+                                totalReviews: item.totalReviews || 0,
+                                status: item.trangThai || 'ACTIVE',
+                                createdAt: item.ngayTao || new Date().toISOString(),
+                                updatedAt: item.ngayCapNhat || new Date().toISOString(),
+                            };
+                        });
+                    };
+
+                    if (!filters.serviceCategory || (filters.serviceCategory as any) === 'all') {
+                        const [hotels, restaurants, activities, vehicles] = await Promise.all([
+                            fetchCategory('hotels'),
+                            fetchCategory('restaurants'),
+                            fetchCategory('activities'),
+                            fetchCategory('vehicles')
+                        ]);
+                        results = [...hotels, ...restaurants, ...activities, ...vehicles];
+                    } else {
+                        results = await fetchCategory(filters.serviceCategory);
+                    }
+
+                    // Sort combined results by ratingAvg
+                    results.sort((a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0));
+                    
+                    // Simple pagination slice since we merged
+                    total = results.length;
+                    const page = filters.page || 1;
+                    const pageSize = 12;
+                    const paginatedResults = results.slice((page - 1) * pageSize, page * pageSize);
+                    
+                    return { data: { data: paginatedResults, total, page, pageSize, totalPages: Math.ceil(total / pageSize) } };
+                } catch (error: any) {
+                    return { error: error.message };
+                }
+            },
+            providesTags: ['Explore'],
+        }),
+    }),
+    overrideExisting: false,
+});
+
+export const { useSearchPlacesQuery, useSearchServicesQuery } = exploreApi;

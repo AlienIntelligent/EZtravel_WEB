@@ -1,0 +1,63 @@
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setHistoryFilter } from '../../store/aiSlice';
+import { useGetAIHistoryQuery } from '../../api/aiApi';
+import Pagination from '../../shared/components/Pagination';
+
+function AIHistory() {
+  const dispatch = useAppDispatch();
+  const filter = useAppSelector((state) => state.ai.historyFilter);
+  const { data, isLoading } = useGetAIHistoryQuery(filter);
+
+  return (
+    <div className="container py-5">
+        <h3 className="mb-4 font-weight-bold text-dark"><i className="fas fa-history me-2 text-primary"></i> Lịch sử Tương tác AI</h3>
+        <div className="card shadow-sm border-0" style={{ borderRadius: '15px' }}>
+            <div className="card-body p-0">
+                <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                        <thead className="table-light">
+                            <tr>
+                                <th className="px-4 py-3 border-top-0">Thời gian</th>
+                                <th className="py-3 border-top-0">Loại AI</th>
+                                <th className="py-3 border-top-0" style={{ maxWidth: '400px' }}>Nội dung Prompt</th>
+                                <th className="py-3 border-top-0">Kết quả (Tóm tắt)</th>
+                                <th className="px-4 py-3 border-top-0 text-end">Tokens</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {isLoading ?
+                <tr><td colSpan={5} className="text-center py-4"><div className="spinner-border text-primary" /></td></tr> :
+                data?.data.length === 0 ?
+                <tr><td colSpan={5} className="text-center py-4 text-muted">Chưa có lịch sử sử dụng AI.</td></tr> :
+
+                data?.data.map((h) =>
+                <tr key={h.id}>
+                                        <td className="px-4 align-middle text-muted">{new Date(h.createdAt).toLocaleString('vi-VN')}</td>
+                                        <td className="align-middle">
+                                            <span className={`badge ${h.aiType === 'PLANNER' ? 'bg-primary' : h.aiType === 'CHAT' ? 'bg-info' : h.aiType === 'BUDGET' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                                                {h.aiType}
+                                            </span>
+                                        </td>
+                                        <td className="align-middle text-truncate" style={{ maxWidth: '400px' }} title={h.prompt}>
+                                            {h.prompt}
+                                        </td>
+                                        <td className="align-middle text-muted small">{h.resultSummary || '-'}</td>
+                                        <td className="px-4 align-middle text-end fw-bold">{h.tokens.toLocaleString()}</td>
+                                    </tr>
+                )
+                }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {data && data.totalPages > 1 &&
+        <div className="card-footer bg-white border-top py-3">
+                    <Pagination currentPage={filter.page} totalPages={data.totalPages} onPageChange={(p) => dispatch(setHistoryFilter({ page: p }))} />
+                </div>
+        }
+        </div>
+    </div>);
+
+}
+
+export default AIHistory;

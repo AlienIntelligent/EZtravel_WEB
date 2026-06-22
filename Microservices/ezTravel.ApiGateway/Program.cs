@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 });
 
 builder.Services.AddReverseProxy()
@@ -43,8 +43,17 @@ app.MapReverseProxy(pipeline =>
     {
         if (context.User.Identity?.IsAuthenticated == true)
         {
+            var status = context.User.FindFirst("status")?.Value;
+            if (status == "BANNED")
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new { message = "Tài khoản của bạn đã bị khóa." });
+                return;
+            }
+
             var userId = context.User.FindFirst("sub")?.Value;
-            var email  = context.User.FindFirst("email")?.Value;
+            var email = context.User.FindFirst("email")?.Value;
 
             if (userId != null)
                 context.Request.Headers["X-User-Id"] = userId;

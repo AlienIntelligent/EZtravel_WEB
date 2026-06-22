@@ -1,0 +1,195 @@
+import { baseApi } from './baseApi';
+import { Trip, TripDay, TripPlace, TripService, Place, Service } from '../shared/types';
+
+// Response model for full trip
+export interface FullTripResponse {
+    trip: Trip;
+    days: TripDay[];
+    places: TripPlace[];
+    services: TripService[];
+    resolvedPlaces: Place[];
+    resolvedServices: Service[];
+}
+
+export const tripApi = baseApi.injectEndpoints({
+    endpoints: (builder) => ({
+        getTrips: builder.query<Trip[], void>({
+            query: () => ({ url: '/trips', method: 'GET' }),
+            transformResponse: (response: any[]) => response.map(item => ({
+                id: item.id?.toString(),
+                userId: '',
+                title: item.tenLichTrinh,
+                description: item.moTa || '',
+                startDate: item.ngayBatDau || '',
+                endDate: item.ngayKetThuc || '',
+                visibility: item.laCongKhai ? 'PUBLIC' : 'PRIVATE',
+                totalBudget: item.tongChiPhi || 0,
+                status: 'PLANNED',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            })),
+            providesTags: ['Trip'],
+        }),
+        
+        getTripDetails: builder.query<FullTripResponse, string>({
+            query: (tripId) => ({ url: `/trips/${tripId}`, method: 'GET' }),
+            transformResponse: (response: any) => {
+                const resolvedPlaces: Place[] = [];
+                const resolvedServices: Service[] = [];
+                const days = (response.days || []).map((day: any) => ({
+                    id: day.maNgay?.toString(),
+                    tripId: response.id?.toString(),
+                    date: day.ngay || '',
+                    sequence: day.soThuTu || 0,
+                    note: day.ghiChu || '',
+                    items: (day.items || []).map((item: any) => {
+                        if (item.maDiaDiem) {
+                            resolvedPlaces.push({
+                                id: item.maDiaDiem?.toString(),
+                                name: item.tenDiaDiem || 'Địa điểm',
+                            } as Place);
+                            return {
+                                id: item.id?.toString(),
+                                dayId: day.maNgay?.toString(),
+                                placeId: item.maDiaDiem?.toString(),
+                                sequence: item.thuTu || 0,
+                                note: item.ghiChu || '',
+                                title: item.tieuDe || item.tenDiaDiem,
+                                startTime: item.startTime,
+                                endTime: item.endTime,
+                                estimatedCost: item.chiPhiDuKien || 0
+                            } as TripPlace;
+                        }
+                        return null;
+                    }).filter(Boolean)
+                }));
+                
+                return {
+                    trip: {
+                        id: response.id?.toString(),
+                        title: response.tenLichTrinh,
+                        description: response.moTa || '',
+                        startDate: response.ngayBatDau || '',
+                        endDate: response.ngayKetThuc || '',
+                        visibility: response.laCongKhai ? 'PUBLIC' : 'PRIVATE',
+                        totalBudget: response.tongChiPhi || 0,
+                        status: 'PLANNED',
+                    } as Trip,
+                    days,
+                    places: [],
+                    services: [],
+                    resolvedPlaces,
+                    resolvedServices
+                };
+            },
+            providesTags: (result, error, id) => [{ type: 'Trip', id }],
+        }),
+
+        createTrip: builder.mutation<Trip, Partial<Trip>>({
+            query: (newTrip) => ({
+                url: '/trips',
+                method: 'POST',
+                body: {
+                    tenLichTrinh: newTrip.title || 'Chuyến đi mới',
+                    moTa: newTrip.description || '',
+                    ngayBatDau: newTrip.startDate ? newTrip.startDate.split('T')[0] : null,
+                    ngayKetThuc: newTrip.endDate ? newTrip.endDate.split('T')[0] : null,
+                    laCongKhai: newTrip.visibility === 'PUBLIC'
+                },
+            }),
+            transformResponse: (response: any) => ({
+                id: response.id?.toString(),
+                userId: '',
+                title: response.tenLichTrinh,
+                description: response.moTa || '',
+                startDate: response.ngayBatDau || '',
+                endDate: response.ngayKetThuc || '',
+                visibility: response.laCongKhai ? 'PUBLIC' : 'PRIVATE',
+                totalBudget: response.tongChiPhi || 0,
+                status: 'PLANNED',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }),
+            invalidatesTags: ['Trip'],
+        }),
+
+        updateTrip: builder.mutation<Trip, { id: string; data: Partial<Trip> }>({
+            query: ({ id, data }) => ({
+                url: `/trips/${id}`,
+                method: 'PUT',
+                body: data,
+            }),
+            invalidatesTags: (result, error, { id }) => [{ type: 'Trip', id }],
+        }),
+
+        // Sequence ordering endpoint
+        updateSequence: builder.mutation<void, { 
+            tripId: string; 
+            updates: Array<{ id: string; type: 'PLACE' | 'SERVICE'; sequence: number; dayId: string }> 
+        }>({
+            query: ({ tripId, updates }) => ({
+                url: `/trips/${tripId}/reorder`,
+                method: 'PUT',
+                body: { 
+                    items: updates.map(u => ({
+                        maChiTiet: parseInt(u.id),
+                        maNgay: parseInt(u.dayId) || 0,
+                        thuTu: u.sequence
+                    }))
+                },
+            }),
+            // Optimistic update should be used in UI, we can just invalidate or rely on local state
+            // invalidatesTags: (result, error, { tripId }) => [{ type: 'Trip', id: tripId }],
+        }),
+
+        // Add a location to a day
+        addTripLocation: builder.mutation<void, { 
+            tripId: string; 
+            dayId: string; 
+            placeId?: string; 
+            serviceId?: string;
+            serviceType?: string;
+            title?: string;
+            cost?: number;
+        }>({
+            query: (req) => {
+                const body: any = {
+                    maNgay: parseInt(req.dayId),
+                    tieuDe: req.title,
+                    chiPhiDuKien: req.cost
+                };
+                if (req.placeId) body.maDiaDiem = parseInt(req.placeId);
+                
+                if (req.serviceId && req.serviceType) {
+                    if (req.serviceType === 'ACCOMMODATION' || req.serviceType === 'KHACH_SAN') body.maKhachSan = parseInt(req.serviceId);
+                    else if (req.serviceType === 'FOOD' || req.serviceType === 'NHA_HANG') body.maNhaHang = parseInt(req.serviceId);
+                    else if (req.serviceType === 'ACTIVITY' || req.serviceType === 'HOAT_DONG') body.maHoatDong = parseInt(req.serviceId);
+                    else if (req.serviceType === 'TRANSPORT' || req.serviceType === 'PHUONG_TIEN') body.maPhuongTien = parseInt(req.serviceId);
+                }
+
+                return {
+                    url: `/trips/${req.tripId}/locations`,
+                    method: 'POST',
+                    body
+                };
+            }
+        }),
+
+        removeTripLocation: builder.mutation<void, { tripId: string; itemId: string }>({
+            query: ({ tripId, itemId }) => ({
+                url: `/trips/${tripId}/items/${itemId}`,
+                method: 'DELETE'
+            })
+        }),
+    }),
+});
+
+export const {
+    useGetTripsQuery,
+    useGetTripDetailsQuery,
+    useCreateTripMutation,
+    useUpdateTripMutation,
+    useUpdateSequenceMutation,
+    useAddTripLocationMutation,
+    useRemoveTripLocationMutation
+} = tripApi;

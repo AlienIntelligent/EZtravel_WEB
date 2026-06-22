@@ -1,0 +1,160 @@
+import { create } from 'zustand';
+import { tripApi } from '../api';
+
+const useTripStore = create((set, get) => ({
+    userTrips: [],
+    currentTrip: null,
+    loading: false,
+    error: null,
+    metadata: {
+        styles: [],
+        targets: [],
+        budgets: [],
+    },
+
+    fetchUserTrips: async () => {
+        set({ loading: true, error: null });
+        try {
+            const response = await tripApi.getAll();
+            const data = response.data?.data || response.data || [];
+            set({ userTrips: data, loading: false });
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to fetch trips', loading: false });
+        }
+    },
+
+    fetchTripDetail: async (tripId) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await tripApi.getById(tripId);
+            const data = response.data?.data || response.data;
+            set({ currentTrip: data, loading: false });
+            return data;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to fetch trip detail', loading: false });
+            return null;
+        }
+    },
+
+    createTrip: async (data) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await tripApi.create(data);
+            const newTrip = response.data?.data || response.data;
+            set((state) => ({
+                userTrips: [newTrip, ...state.userTrips],
+                loading: false,
+            }));
+            return newTrip;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to create trip', loading: false });
+            return null;
+        }
+    },
+
+    updateTrip: async (tripId, data) => {
+        set({ loading: true, error: null });
+        try {
+            await tripApi.update(tripId, data);
+            // Re-fetch detail to refresh state
+            await get().fetchTripDetail(tripId);
+            await get().fetchUserTrips();
+            set({ loading: false });
+            return true;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to update trip', loading: false });
+            return false;
+        }
+    },
+
+    deleteTrip: async (tripId) => {
+        set({ loading: true, error: null });
+        try {
+            await tripApi.delete(tripId);
+            set((state) => ({
+                userTrips: state.userTrips.filter((t) => t.id !== tripId),
+                currentTrip: state.currentTrip?.id === tripId ? null : state.currentTrip,
+                loading: false,
+            }));
+            return true;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to delete trip', loading: false });
+            return false;
+        }
+    },
+
+    addActivity: async (tripId, data) => {
+        set({ loading: true, error: null });
+        try {
+            await tripApi.addLocation(tripId, data);
+            await get().fetchTripDetail(tripId);
+            set({ loading: false });
+            return true;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to add activity', loading: false });
+            return false;
+        }
+    },
+
+    removeActivity: async (tripId, itemId) => {
+        set({ loading: true, error: null });
+        try {
+            await tripApi.removeLocation(tripId, itemId);
+            await get().fetchTripDetail(tripId);
+            set({ loading: false });
+            return true;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to remove activity', loading: false });
+            return false;
+        }
+    },
+
+    reorderActivities: async (tripId, items) => {
+        set({ loading: true, error: null });
+        try {
+            // items is array of { maChiTiet, maNgay, thuTu }
+            await tripApi.reorderItems(tripId, { items });
+            await get().fetchTripDetail(tripId);
+            set({ loading: false });
+            return true;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to reorder activities', loading: false });
+            return false;
+        }
+    },
+
+    fetchMetadata: async () => {
+        try {
+            const [stylesRes, targetsRes, budgetsRes] = await Promise.all([
+                tripApi.getStyles(),
+                tripApi.getTargets(),
+                tripApi.getBudgets(),
+            ]);
+            set({
+                metadata: {
+                    styles: stylesRes.data?.data || stylesRes.data || [],
+                    targets: targetsRes.data?.data || targetsRes.data || [],
+                    budgets: budgetsRes.data?.data || budgetsRes.data || [],
+                },
+            });
+        } catch (error) {
+            console.error('Failed to fetch planning metadata:', error);
+        }
+    },
+
+    cloneTrip: async (tripId) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await tripApi.clone(tripId);
+            const cloned = response.data?.data || response.data;
+            await get().fetchUserTrips();
+            set({ loading: false });
+            return cloned;
+        } catch (error) {
+            set({ error: error.response?.data?.message || 'Failed to clone trip', loading: false });
+            return null;
+        }
+    },
+}));
+
+export default useTripStore;

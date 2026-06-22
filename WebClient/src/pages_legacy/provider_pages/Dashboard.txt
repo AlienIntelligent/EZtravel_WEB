@@ -1,0 +1,504 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+const ProviderDashboard = () => {
+  const [stats, setStats] = useState({
+    totalServices: 0,
+    activeBookings: 0,
+    pendingBookings: 0,
+    todayRevenue: 0,
+    monthRevenue: 0,
+    avgRating: 0,
+    totalReviews: 0,
+    checkinsToday: 0,
+    checkoutsToday: 0,
+  });
+
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [todayOperations, setTodayOperations] = useState([]);
+  const [topServices, setTopServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // TODO: Fetch real data from API
+    // For now using mock data
+    const mockStats = {
+      totalServices: 12,
+      activeBookings: 8,
+      pendingBookings: 3,
+      todayRevenue: 5200000,
+      monthRevenue: 45800000,
+      avgRating: 4.5,
+      totalReviews: 156,
+      checkinsToday: 5,
+      checkoutsToday: 3,
+    };
+    setStats(mockStats);
+
+    const mockRecentBookings = [
+      {
+        id: 1,
+        bookingCode: "BK20260520001",
+        service: "Khách sạn Hạ Long Bay",
+        customer: "Nguyễn Văn A",
+        status: "CONFIRMED",
+        amount: 2500000,
+        date: "2026-05-20",
+        time: "14:30",
+        type: "KHACH_SAN",
+      },
+      {
+        id: 2,
+        bookingCode: "BK20260520002",
+        service: "Tour Hà Nội - Hạ Long",
+        customer: "Trần Thị B",
+        status: "PENDING",
+        amount: 1800000,
+        date: "2026-05-20",
+        time: "09:00",
+        type: "HOAT_DONG",
+      },
+      {
+        id: 3,
+        bookingCode: "BK20260520003",
+        service: "Nhà hàng Hội An",
+        customer: "Lê Văn C",
+        status: "CONFIRMED",
+        amount: 450000,
+        date: "2026-05-20",
+      },
+    ];
+    setRecentBookings(mockRecentBookings);
+
+    const mockTodayOperations = [
+      {
+        id: 1,
+        service: "Khách sạn Hạ Long Bay",
+        type: "KHACH_SAN",
+        bookings: 3,
+        revenue: 7500000,
+      },
+      {
+        id: 2,
+        service: "Tour Hà Nội - Hạ Long",
+        type: "HOAT_DONG",
+        bookings: 2,
+        revenue: 3600000,
+      },
+      {
+        id: 3,
+        service: "Nhà hàng Hội An",
+        type: "NHA_HANG",
+        bookings: 5,
+        revenue: 2250000,
+      },
+    ];
+    setTodayOperations(mockTodayOperations);
+
+    const mockTopServices = [
+      {
+        id: 1,
+        name: "Khách sạn Hạ Long Bay",
+        type: "KHACH_SAN",
+        bookings: 45,
+        revenue: 112500000,
+        rating: 4.8,
+      },
+      {
+        id: 2,
+        name: "Tour Hà Nội - Hạ Long",
+        type: "HOAT_DONG",
+        bookings: 32,
+        revenue: 57600000,
+        rating: 4.7,
+      },
+      {
+        id: 3,
+        name: "Nhà hàng Hội An",
+        type: "NHA_HANG",
+        bookings: 28,
+        revenue: 12600000,
+        rating: 4.6,
+      },
+    ];
+    setTopServices(mockTopServices);
+    setLoading(false);
+  }, []);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      CONFIRMED: { color: "bg-success", label: "Đã xác nhận" },
+      PENDING: {
+        color: "bg-warning",
+        label: "Chờ xác nhận",
+      },
+      CANCELLED: { color: "bg-danger", label: "Đã hủy" },
+      COMPLETED: { color: "bg-primary", label: "Hoàn thành" },
+      IN_PROGRESS: {
+        color: "bg-info",
+        label: "Đang thực hiện",
+      },
+    };
+    const config = statusConfig[status] || {
+      color: "bg-secondary",
+      label: status,
+    };
+    return <span className={`badge ${config.color}`}>{config.label}</span>;
+  };
+
+  const getServiceTypeLabel = (type) => {
+    const labels = {
+      KHACH_SAN: "Khách sạn",
+      NHA_HANG: "Nhà hàng",
+      HOAT_DONG: "Hoạt động",
+      PHUONG_TIEN: "Phương tiện",
+    };
+    return labels[type] || type;
+  };
+
+  const getServiceTypeIcon = (type) => {
+    const icons = {
+      KHACH_SAN: "home",
+      NHA_HANG: "coffee",
+      HOAT_DONG: "target",
+      PHUONG_TIEN: "truck",
+    };
+    return icons[type] || "map-pin";
+  };
+
+  const getOperationTypeLabel = (type) => {
+    const labels = {
+      CHECKIN: "Check-in",
+      CHECKOUT: "Check-out",
+      TOUR_START: "Khởi hành",
+      DINING: "Ăn uống",
+      PICKUP: "Đón khách",
+    };
+    return labels[type] || type;
+  };
+
+  const getOperationTypeIcon = (type) => {
+    const icons = {
+      CHECKIN: "log-in",
+      CHECKOUT: "log-out",
+      TOUR_START: "compass",
+      DINING: "coffee",
+      PICKUP: "truck",
+    };
+    return icons[type] || "map-pin";
+  };
+
+  const getOperationTypeColor = (type) => {
+    const colors = {
+      CHECKIN: "text-success",
+      CHECKOUT: "text-primary",
+      TOUR_START: "text-info",
+      DINING: "text-warning",
+      PICKUP: "text-secondary",
+    };
+    return colors[type] || "text-muted";
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}
+      >
+        <div className="text-center">
+          <div
+            className="spinner-border text-primary"
+            role="status"
+            style={{ width: "3rem", height: "3rem" }}
+          ></div>
+          <p className="mt-3 text-muted">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-fluid p-0">
+      <div className="mb-3">
+        <h1 className="h3">
+          <strong>Dashboard</strong> Nhà Cung Cấp
+        </h1>
+      </div>
+      {stats.pendingBookings > 0 && (
+        <div
+          className="alert alert-warning alert-dismissible fade show"
+          role="alert"
+        >
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+          <h5 className="alert-heading">
+            <i data-feather="alert-triangle"></i> Cảnh báo!
+          </h5>
+          Bạn có <strong>{stats.pendingBookings}</strong> đơn đặt chờ xác nhận.
+          <Link to="/provider/bookings?status=PENDING" className="alert-link">
+            Xử lý ngay
+          </Link>
+        </div>
+      )}
+
+      <div className="row">
+        <div className="col-xl-3 col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col mt-0">
+                  <h5 className="card-title">Tổng đơn đặt</h5>
+                </div>
+                <div className="col-auto">
+                  <div className="stat text-primary">
+                    <i
+                      className="align-middle"
+                      data-feather="shopping-cart"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+              <h1 className="mt-1 mb-3">
+                {stats.activeBookings + stats.pendingBookings}
+              </h1>
+              <div className="mb-0">
+                <span className="text-success">+5.25%</span>
+                <span className="text-muted">Since last week</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-xl-3 col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col mt-0">
+                  <h5 className="card-title">Đơn xác nhận</h5>
+                </div>
+                <div className="col-auto">
+                  <div className="stat text-success">
+                    <i className="align-middle" data-feather="check-circle"></i>
+                  </div>
+                </div>
+              </div>
+              <h1 className="mt-1 mb-3">{stats.activeBookings}</h1>
+              <div className="mb-0">
+                <span className="text-success">+3.65%</span>
+                <span className="text-muted">Since last week</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-xl-3 col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col mt-0">
+                  <h5 className="card-title">Đơn chờ xử lý</h5>
+                </div>
+                <div className="col-auto">
+                  <div className="stat text-warning">
+                    <i className="align-middle" data-feather="clock"></i>
+                  </div>
+                </div>
+              </div>
+              <h1 className="mt-1 mb-3">{stats.pendingBookings}</h1>
+              <div className="mb-0">
+                <span className="text-danger">-2.25%</span>
+                <span className="text-muted">Since last week</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-xl-3 col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col mt-0">
+                  <h5 className="card-title">Doanh thu tháng</h5>
+                </div>
+                <div className="col-auto">
+                  <div className="stat text-primary">
+                    <i className="align-middle" data-feather="dollar-sign"></i>
+                  </div>
+                </div>
+              </div>
+              <h1 className="mt-1 mb-3">
+                {formatCurrency(stats.monthRevenue)}
+              </h1>
+              <div className="mb-0">
+                <span className="text-success">+6.65%</span>
+                <span className="text-muted">Since last month</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-12 col-lg-8">
+          <div className="card flex-fill">
+            <div className="card-header">
+              <h5 className="card-title mb-0">Đơn đặt gần đây</h5>
+            </div>
+            <div className="card-body p-0">
+              <table className="table table-hover my-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Dịch vụ</th>
+                    <th>Khách hàng</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đặt</th>
+                    <th>Số tiền</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentBookings.slice(0, 5).map((booking) => (
+                    <tr key={booking.id}>
+                      <td>{booking.id}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <i
+                            className={`me-2 ${getOperationTypeColor(booking.type)}`}
+                            data-feather={getServiceTypeIcon(booking.type)}
+                          ></i>
+                          <div>
+                            <div className="text-dark">{booking.service}</div>
+                            <small className="text-muted">
+                              {getServiceTypeLabel(booking.type)}
+                            </small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{booking.customer}</td>
+                      <td>{getStatusBadge(booking.status)}</td>
+                      <td>{booking.date}</td>
+                      <td>{formatCurrency(booking.amount)}</td>
+                      <td>
+                        <Link
+                          to={`/provider/bookings/${booking.id}`}
+                          className="btn btn-sm btn-primary"
+                        >
+                          <i data-feather="folder"></i>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 col-lg-4">
+          <div className="card flex-fill">
+            <div className="card-header">
+              <h5 className="card-title mb-0">Vận hành hôm nay</h5>
+            </div>
+            <div className="card-body p-0">
+              <ul className="list-group list-group-flush">
+                {todayOperations.map((op, index) => (
+                  <li key={index} className="list-group-item">
+                    <div className="d-flex align-items-center">
+                      <div className="me-3">
+                        <i
+                          className={`${getOperationTypeColor(op.type)}`}
+                          data-feather={getOperationTypeIcon(op.type)}
+                        ></i>
+                      </div>
+                      <div className="flex-grow-1">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span className="text-dark font-weight-bold">
+                            {op.service}
+                          </span>
+                          <span
+                            className={`badge ${op.status === "COMPLETED" ? "bg-success" : "bg-warning"}`}
+                          >
+                            {op.status === "COMPLETED"
+                              ? "Hoàn thành"
+                              : "Chờ xử lý"}
+                          </span>
+                        </div>
+                        <small className="text-muted">
+                          {getOperationTypeLabel(op.type)} - {op.time}
+                        </small>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-12">
+          <div className="card">
+            <div className="card-header">
+              <h5 className="card-title mb-0">Dịch vụ nổi bật</h5>
+            </div>
+            <div className="card-body table-responsive p-0">
+              <table className="table table-hover my-0">
+                <thead>
+                  <tr>
+                    <th>Dịch vụ</th>
+                    <th>Loại</th>
+                    <th>Đơn đặt</th>
+                    <th>Doanh thu</th>
+                    <th>Đánh giá</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topServices.map((service, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className="text-dark font-weight-bold">
+                          {service.name}
+                        </div>
+                        <small className="text-muted">
+                          {service.location || "N/A"}
+                        </small>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <i
+                            className="me-2 text-primary"
+                            data-feather={getServiceTypeIcon(service.type)}
+                          ></i>
+                          {getServiceTypeLabel(service.type)}
+                        </div>
+                      </td>
+                      <td>{service.bookings}</td>
+                      <td>{formatCurrency(service.revenue)}</td>
+                      <td>
+                        <span className="badge bg-success">
+                          {service.rating} ⭐
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProviderDashboard;

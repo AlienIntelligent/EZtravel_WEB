@@ -1,0 +1,138 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { formatCurrency } from '../../utils/formatters';
+import { hotelApi, restaurantApi } from '../../api';
+import ReviewBoard from '../../components/ReviewBoard';
+
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
+
+const HotelSingle = () => {
+    const query = useQuery();
+    const id = query.get('id');
+    const type = query.get('type') || 'hotel'; // 'hotel' or 'restaurant'
+
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchDetail = async () => {
+            if (!id) {
+                setError('Không tìm thấy ID dịch vụ.');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                if (type === 'restaurant') {
+                    const res = await restaurantApi.getById(id);
+                    const r = res.data;
+                    setData({
+                        id: r.id,
+                        name: r.tenNhaHang,
+                        description: r.moTa || 'Không có mô tả chi tiết.',
+                        image: r.anhDaiDien || '/images/restaurant-1.jpg',
+                        price: r.giaTrungBinh || 150000,
+                        unit: 'khách',
+                        rating: r.ratingAvg || 5,
+                        reviews: r.totalReviews || 0,
+                        province: r.tenDiaDiem || 'Việt Nam',
+                        amenities: ['Món ăn truyền thống', 'Không gian sang trọng', 'Có phòng VIP'],
+                        availability: 'Còn bàn'
+                    });
+                } else {
+                    const res = await hotelApi.getById(id);
+                    const h = res.data;
+                    setData({
+                        id: h.id,
+                        name: h.tenKhachSan,
+                        description: h.moTa || 'Không có mô tả chi tiết.',
+                        image: h.anhDaiDien || '/images/hotel-1.jpg',
+                        price: h.giaTu || 600000,
+                        unit: 'đêm',
+                        rating: h.ratingAvg || 5,
+                        reviews: h.totalReviews || 0,
+                        province: h.tenDiaDiem || h.diaChi || 'Việt Nam',
+                        amenities: ['Wifi miễn phí', 'Hồ bơi ngoài trời', 'Bữa sáng miễn phí', 'Điều hòa'],
+                        availability: 'Còn phòng'
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load detail from backend', err);
+                setError('Không thể tải thông tin dịch vụ từ máy chủ.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDetail();
+    }, [id, type]);
+
+    if (loading) {
+        return (
+            <div className="text-center p-5" style={{ marginTop: '100px' }}>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="sr-only">Đang tải...</span>
+                </div>
+                <p className="mt-3">Đang tải thông tin dịch vụ...</p>
+            </div>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <div className="text-center p-5" style={{ marginTop: '100px' }}>
+                <h3 className="text-danger">{error || 'Không tìm thấy dịch vụ'}</h3>
+                <Link to="/hotels" className="btn btn-primary mt-3">Quay lại danh sách</Link>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <div className="hero-wrap js-fullheight" style={{ backgroundImage: `url(${data.image})`, minHeight: '80vh' }}>
+                <div className="overlay"></div>
+                <div className="container">
+                    <div className="row no-gutters slider-text js-fullheight align-items-center justify-content-center">
+                        <div className="col-md-9 ftco-animate text-center" style={{ marginTop: '200px' }}>
+                            <p className="breadcrumbs"><span className="mr-2"><Link to="/">Trang chu</Link></span> <span>{type === 'hotel' ? 'Khách sạn' : 'Nhà hàng'}</span></p>
+                            <h1 className="mb-3 bread">{data.name}</h1>
+                            <p className="text-white h5">{data.province} - {formatCurrency(data.price)}/{data.unit}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section className="ftco-section">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-8">
+                            <h2>{data.name}</h2>
+                            <p className="lead">{data.description}</p>
+                            <div className="my-4">
+                                <h5>Tiện ích có sẵn</h5>
+                                {data.amenities.map((item) => (
+                                    <span className="badge badge-primary p-2 mr-2 mb-2" style={{ fontSize: '14px' }} key={item}>{item}</span>
+                                ))}
+                            </div>
+                            
+                            <ReviewBoard targetId={id} type={type === 'hotel' ? 'KhachSan' : 'NhaHang'} />
+                        </div>
+
+                        <div className="col-lg-4">
+                            <div className="sidebar-wrap bg-light p-4 rounded border">
+                                <h3 className="mb-4">Thông tin thêm</h3>
+                                <p><strong>Trạng thái:</strong> <span className="text-success">{data.availability}</span></p>
+                                <p><strong>Giá cơ bản:</strong> {formatCurrency(data.price)}/{data.unit}</p>
+                                <p><strong>Đánh giá:</strong> {data.rating}/5 từ {data.reviews} đánh giá</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+};
+
+export default HotelSingle;

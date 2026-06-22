@@ -6,6 +6,20 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add Infrastructure & Services
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices();
+builder.Services.AddMemoryCache();
+
+// ===================== CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 // 2. Add Controllers & Swagger
 builder.Services.AddControllers();
@@ -22,7 +36,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ===================== USE CORS
+app.UseCors("AllowReact");
+
 app.UseAuthorization();
+
+app.UseStaticFiles();
+
 app.MapControllers();
 
 app.Run();

@@ -1,4 +1,4 @@
-﻿using ezTravel.Libs;
+using ezTravel.Libs;
 using ezTravel.Repository.Implementations;
 using ezTravel.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +22,10 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IGoiDichVuNccRepository, GoiDichVuNccRepository>();
+        services.AddScoped<IDangKyGoiNccRepository, DangKyGoiNccRepository>();
+        services.AddScoped<IThanhToanNccRepository, ThanhToanNccRepository>();
 
         return services;
     }

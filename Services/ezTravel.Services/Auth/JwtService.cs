@@ -25,7 +25,8 @@ public class JwtService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.MaNguoiDung.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.VaiTro ?? string.Empty)
+            new Claim(ClaimTypes.Role, user.VaiTro ?? string.Empty),
+            new Claim("status", user.TrangThai ?? "ACTIVE")
         };
 
         var creds = new SigningCredentials(
@@ -36,10 +37,16 @@ public class JwtService
             issuer: jwt["Issuer"],
             audience: jwt["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(int.Parse(jwt["ExpiryMinutes"]!)),
+            expires: GetAccessTokenExpiry(),
             signingCredentials: creds
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public DateTime GetAccessTokenExpiry()
+    {
+        var configured = _config.GetSection("JwtSettings")["ExpiryMinutes"];
+        return DateTime.UtcNow.AddMinutes(int.TryParse(configured, out var minutes) ? minutes : 60);
     }
 }

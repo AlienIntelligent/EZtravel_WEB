@@ -1,0 +1,209 @@
+@import "./styles/tokens.css";
+@import "tailwindcss";
+@config "../tailwind.config.js";
+ 
+@layer base {
+  :root {
+    --background: 210 33.3% 97.6%; /* #F8FAFC Slate 50 */
+    --foreground: 215.3 25% 26.7%; /* #334155 Slate 700 Body */
+    --heading: 222.2 47.4% 11.2%; /* #0F172A Slate 900 Heading */
+
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 215.3 25% 26.7%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 215.3 25% 26.7%;
+ 
+    /* Primary action: ezTravel coral #FF5A5F */
+    --primary: 358.4 100% 67.6%;
+    --primary-foreground: 0 0% 100%;
+ 
+    /* Secondary: Teal #14B8A6 */
+    --secondary: 173.4 80.4% 40%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Premium: Gold #D4AF37 */
+    --premium: 46.5 65.4% 52.7%;
+    --premium-foreground: 0 0% 100%;
+
+    /* Accent: Amber #F59E0B */
+    --accent: 37.7 92.1% 50.2%;
+    --accent-foreground: 0 0% 100%;
+ 
+    /* Success #22C55E */
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 0 0% 100%;
+ 
+    /* Warning #F97316 */
+    --warning: 24.6 95% 53.1%;
+    --warning-foreground: 0 0% 100%;
+ 
+    /* Danger #EF4444 */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+ 
+    --muted: 210 40% 96.1%; /* Slate 100 */
+    --muted-foreground: 215 16.3% 46.9%; /* Slate 500 */
+ 
+    --border: 214.3 31.8% 91.4%; /* Slate 200 */
+    --input: 214.3 31.8% 91.4%;
+    --ring: 358.4 100% 67.6%;
+ 
+    --radius: 0.5rem; /* 8px default */
+  }
+ 
+  .dark {
+    /* Background Slate 950 */
+    --background: 222.2 47.4% 11.2%; 
+    --foreground: 210 33.3% 97.6%; /* Slate 100 Body */
+    --heading: 210 33.3% 97.6%; /* Slate 100 Heading */
+ 
+    /* Card Slate 900 */
+    --card: 215.3 32.5% 17.5%; 
+    --card-foreground: 210 33.3% 97.6%;
+ 
+    /* Popover/Elevated Slate 900 */
+    --popover: 215.3 25% 26.7%; 
+    --popover-foreground: 210 33.3% 97.6%;
+ 
+    --primary: 358.4 100% 67.6%;
+    --primary-foreground: 0 0% 100%;
+ 
+    /* Secondary: Teal */
+    --secondary: 173.4 80.4% 40%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Premium: Gold */
+    --premium: 46.5 65.4% 52.7%;
+    --premium-foreground: 0 0% 100%;
+
+    /* Accent: Amber */
+    --accent: 37.7 92.1% 50.2%;
+    --accent-foreground: 0 0% 100%;
+ 
+    /* Success */
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 0 0% 100%;
+ 
+    /* Warning */
+    --warning: 24.6 95% 53.1%;
+    --warning-foreground: 0 0% 100%;
+ 
+    /* Danger */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+ 
+    --muted: 215.3 25% 26.7%; /* Slate 700 */
+    --muted-foreground: 215 16.3% 46.9%; /* Slate 400 */
+ 
+    /* Border Slate 800 */
+    --border: 215.3 19.3% 34.5%; 
+    --input: 215.3 19.3% 34.5%;
+    --ring: 358.4 100% 67.6%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    min-width: 320px;
+    background: hsl(var(--background));
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-width: 320px;
+    margin: 0;
+    letter-spacing: 0;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans text-heading;
+    letter-spacing: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: 0;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  /* Accessibility rules matching DESIGN_SYSTEM_V2.md */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+}
+
+/* Custom Shell Header Layout overrides - avoids spacing.16 override */
+.app-header {
+  height: 64px;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+  z-index: 40;
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    display: grid;
+    grid-template-columns: 248px 1fr;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .header-search-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.operations-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.2;
+  font-weight: 700;
+  color: hsl(var(--heading));
+}
+
+.page-description {
+  margin-top: 0.375rem;
+  max-width: 48rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.header-search-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

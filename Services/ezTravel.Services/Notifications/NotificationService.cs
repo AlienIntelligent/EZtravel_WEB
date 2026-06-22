@@ -16,43 +16,94 @@ public class NotificationService : INotificationService
 
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(int userId)
     {
-        return await _uow.ThongBaos.GetQueryable()
+        if (userId <= 0)
+        {
+            return Enumerable.Empty<NotificationDto>();
+        }
+
+        var notifications = await _uow.ThongBaos.GetQueryable()
             .Where(n => n.MaNguoiDung == userId)
-            .OrderByDescending(n => n.NgayTao)
-            .Select(n => new NotificationDto
-            {
-                Id = n.MaThongBao,
-                Title = n.TieuDe,
-                Content = n.NoiDung,
-                Type = n.LoaiThongBao,
-                IsRead = n.DaDoc,
-                CreatedAt = n.NgayTao
-            }).ToListAsync();
+            .OrderBy(n => n.DaDoc)
+            .ThenByDescending(n => n.NgayTao)
+            .Take(50)
+            .ToListAsync();
+
+        return notifications.Select(MapNotification).ToList();
     }
 
-    public async Task<bool> MarkAsReadAsync(int notificationId)
+    public async Task<NotificationDto?> MarkAsReadAsync(int notificationId, int userId)
     {
-        var notification = await _uow.ThongBaos.GetByIdAsync(notificationId);
-        if (notification == null) return false;
+        if (userId <= 0)
+        {
+            return null;
+        }
 
-        notification.DaDoc = true;
-        _uow.ThongBaos.Update(notification);
-        return await _uow.SaveChangesAsync() > 0;
+        var notification = await _uow.ThongBaos.GetQueryable()
+            .FirstOrDefaultAsync(n =>
+                n.MaThongBao == notificationId &&
+                n.MaNguoiDung == userId);
+
+        if (notification == null)
+        {
+            return null;
+        }
+
+        if (!notification.DaDoc)
+        {
+            notification.DaDoc = true;
+            _uow.ThongBaos.Update(notification);
+            await _uow.SaveChangesAsync();
+        }
+
+        return MapNotification(notification);
     }
 
-    public async Task<bool> CreateNotificationAsync(int userId, string title, string content, string type)
+    public async Task<NotificationDto?> CreateNotificationAsync(int userId, string title, string content, string type)
     {
+        if (userId <= 0)
+        {
+            return null;
+        }
+
+        var userExists = await _uow.NguoiDungs.AnyAsync(u => u.MaNguoiDung == userId);
+        if (!userExists)
+        {
+            return null;
+        }
+
         var notification = new ThongBao
         {
             MaNguoiDung = userId,
-            TieuDe = title,
-            NoiDung = content,
-            LoaiThongBao = type,
+            LoaiThongBao = TrimToNull(type) ?? "SYSTEM",
+            TieuDe = TrimToNull(title) ?? "Thong bao",
+            NoiDung = TrimToNull(content) ?? string.Empty,
             DaDoc = false,
             NgayTao = DateTime.UtcNow
         };
 
         await _uow.ThongBaos.AddAsync(notification);
-        return await _uow.SaveChangesAsync() > 0;
+        await _uow.SaveChangesAsync();
+
+        return MapNotification(notification);
+    }
+
+    private static NotificationDto MapNotification(ThongBao notification)
+    {
+        return new NotificationDto
+        {
+            Id = notification.MaThongBao,
+            Title = notification.TieuDe,
+            Content = notification.NoiDung,
+            Message = notification.NoiDung,
+            Type = notification.LoaiThongBao,
+            Link = notification.DuongDan,
+            IsRead = notification.DaDoc,
+            CreatedAt = notification.NgayTao
+        };
+    }
+
+    private static string? TrimToNull(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

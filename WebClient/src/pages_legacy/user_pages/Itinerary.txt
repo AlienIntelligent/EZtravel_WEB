@@ -1,0 +1,992 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import useTripStore from "../../store/tripStore";
+import useAuthStore from "../../store/authStore";
+import { alertSuccess, alertError, confirmAction } from "../../services/swal";
+import { tripApi } from "../../api";
+
+// Formatter helpers
+const formatCurrency = (value) =>
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+
+function Itinerary() {
+  const { isAuthenticated, user } = useAuthStore();
+  const {
+    userTrips,
+    currentTrip,
+    loading,
+    error,
+    metadata,
+    fetchUserTrips,
+    fetchTripDetail,
+    createTrip,
+    updateTrip,
+    deleteTrip,
+    addActivity,
+    removeActivity,
+    reorderActivities,
+    fetchMetadata,
+    cloneTrip
+  } = useTripStore();
+
+  const [activeTab, setActiveTab] = useState("timeline");
+  const [selectedPlaces, setSelectedPlaces] = useState([]);
+  const [selectedPlaceForModal, setSelectedPlaceForModal] = useState(null);
+  
+  // AI Recommendations State
+  const [recommendations, setRecommendations] = useState(null);
+  const [recLoading, setRecLoading] = useState(false);
+  const [recTab, setRecTab] = useState("hotels"); // 'hotels', 'restaurants', 'activities', 'places'
+
+  useEffect(() => {
+    const fetchRecs = async () => {
+      if (!currentTrip) {
+        setRecommendations(null);
+        return;
+      }
+      setRecLoading(true);
+      try {
+        const payload = {
+          maPhongCach: currentTrip.maPhongCach || null,
+          maDoiTuong: currentTrip.maDoiTuong || null,
+          maMucNganSach: currentTrip.maMucNganSach || null,
+          maTinhThanh: null
+        };
+        const res = await tripApi.getRecommendations(payload);
+        setRecommendations(res.data);
+      } catch (err) {
+        console.error("Failed to load AI recommendations:", err);
+      } finally {
+        setRecLoading(false);
+      }
+    };
+    fetchRecs();
+  }, [currentTrip]);
+
+  // Trip Form Modal State
+  const [showTripModal, setShowTripModal] = useState(false);
+  const [isEditingTrip, setIsEditingTrip] = useState(false);
+  const [tripForm, setTripForm] = useState({
+    tenLichTrinh: "",
+    moTa: "",
+    ngayBatDau: "",
+    ngayKetThuc: "",
+    maPhongCach: "",
+    maDoiTuong: "",
+    maMucNganSach: "",
+    laCongKhai: false,
+  });
+
+  // On mount, load general trips and metadata
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchUserTrips();
+      fetchMetadata();
+    }
+    
+    // Load selected scratchpad places from local storage
+    const saved = JSON.parse(localStorage.getItem("eztravel-selected-places")) || [];
+    setSelectedPlaces(saved);
+  }, [fetchUserTrips, fetchMetadata]);
+
+  // Load first trip by default if available and none selected
+  useEffect(() => {
+    if (userTrips.length > 0 && !currentTrip && !loading) {
+      fetchTripDetail(userTrips[0].id);
+    }
+  }, [userTrips, currentTrip, loading, fetchTripDetail]);
+
+  // Sync trip form with active editing trip
+  useEffect(() => {
+    if (isEditingTrip && currentTrip) {
+      setTripForm({
+        tenLichTrinh: currentTrip.tenLichTrinh || "",
+        moTa: currentTrip.moTa || "",
+        ngayBatDau: currentTrip.ngayBatDau || "",
+        ngayKetThuc: currentTrip.ngayKetThuc || "",
+        maPhongCach: currentTrip.maPhongCach || "",
+        maDoiTuong: currentTrip.maDoiTuong || "",
+        maMucNganSach: currentTrip.maMucNganSach || "",
+        laCongKhai: currentTrip.laCongKhai || false,
+      });
+    } else {
+      // Set default creation form
+      setTripForm({
+        tenLichTrinh: "",
+        moTa: "",
+        ngayBatDau: new Date().toISOString().split("T")[0],
+        ngayKetThuc: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        maPhongCach: metadata.styles[0]?.id || "",
+        maDoiTuong: metadata.targets[0]?.id || "",
+        maMucNganSach: metadata.budgets[0]?.id || "",
+        laCongKhai: true,
+      });
+    }
+  }, [isEditingTrip, currentTrip, showTripModal, metadata]);
+
+  // Drag and drop processing
+  const handleDragEnd = async (result) => {
+    if (!result.destination || !currentTrip) return;
+
+    const sourceId = result.source.droppableId;
+    const destId = result.destination.droppableId;
+
+    // Dragging from sidebar to a day
+    if (sourceId === "places") {
+      const place = selectedPlaces[result.source.index];
+      const targetDayId = parseInt(destId);
+      
+      await handleAddPlaceToDay(place, targetDayId);
+      return;
+    }
+
+    // Dragging to reorder within/between days
+    const sourceDayId = parseInt(sourceId);
+    const destDayId = parseInt(destId);
+
+    const updatedDays = JSON.parse(JSON.stringify(currentTrip.days));
+    const sourceDay = updatedDays.find((d) => d.maNgay === sourceDayId);
+    const destDay = updatedDays.find((d) => d.maNgay === destDayId);
+
+    if (!sourceDay || !destDay) return;
+
+    const sourceItems = [...sourceDay.items];
+    const destItems = sourceDayId === destDayId ? sourceItems : [...destDay.items];
+
+    const [movedItem] = sourceItems.splice(result.source.index, 1);
+    destItems.splice(result.destination.index, 0, movedItem);
+
+    // Recalculate sequences
+    sourceDay.items = sourceItems.map((item, idx) => ({ ...item, thuTu: idx + 1 }));
+    if (sourceDayId !== destDayId) {
+      destDay.items = destItems.map((item, idx) => ({ 
+        ...item, 
+        maNgay: destDayId, 
+        thuTu: idx + 1 
+      }));
+    } else {
+      sourceDay.items = destItems.map((item, idx) => ({ ...item, thuTu: idx + 1 }));
+    }
+
+    // Construct flat reorder list
+    const payload = [];
+    updatedDays.forEach((day) => {
+      day.items.forEach((item) => {
+        payload.push({
+          maChiTiet: item.id,
+          maNgay: day.maNgay,
+          thuTu: item.thuTu,
+        });
+      });
+    });
+
+    const success = await reorderActivities(currentTrip.id, payload);
+    if (success) {
+      alertSuccess("Đã lưu thứ tự lịch trình!");
+    } else {
+      alertError("Không thể thay đổi thứ tự lịch trình.");
+    }
+  };
+
+  const handleAddPlaceToDay = async (place, dayId) => {
+    if (!currentTrip) return;
+
+    // Map selected place type to primary specialization id
+    const payload = {
+      maNgay: dayId,
+      tieuDe: place.name,
+      ghiChu: place.location || "",
+      chiPhiDuKien: place.price || 0,
+      startTime: "08:00:00",
+      endTime: "10:00:00",
+    };
+
+    if (place.type === "Hotel") payload.maKhachSan = place.id;
+    else if (place.type === "Restaurant") payload.maNhaHang = place.id;
+    else if (place.type === "Activity") payload.maHoatDong = place.id;
+    else payload.maDiaDiem = place.id;
+
+    const success = await addActivity(currentTrip.id, payload);
+    if (success) {
+      alertSuccess("Đã thêm vào lịch trình!");
+    } else {
+      alertError("Không thể thêm địa điểm này.");
+    }
+  };
+
+  const addRecommendedToScratchpad = (item, type) => {
+    const saved = JSON.parse(localStorage.getItem("eztravel-selected-places")) || [];
+    let formattedType = "place";
+    if (type === "hotels") formattedType = "Hotel";
+    else if (type === "restaurants") formattedType = "Restaurant";
+    else if (type === "activities") formattedType = "Activity";
+    
+    const exists = saved.find((p) => p.id === item.id && p.type === formattedType);
+    if (exists) {
+      alertSuccess("Địa điểm này đã có sẵn trong danh sách!");
+      return;
+    }
+    
+    const newPlace = {
+      id: item.id,
+      name: item.name,
+      location: item.province || "Việt Nam",
+      image: item.image || `https://picsum.photos/600/400?random=${item.id}`,
+      price: item.price || 0,
+      type: formattedType
+    };
+    
+    const updated = [...saved, newPlace];
+    setSelectedPlaces(updated);
+    localStorage.setItem("eztravel-selected-places", JSON.stringify(updated));
+    alertSuccess(`Đã lưu ${item.name} thành công!`);
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    if (!currentTrip) return;
+    
+    const confirm = await confirmAction("Xóa hoạt động", "Bạn chắc chắn muốn xóa hoạt động này khỏi lịch trình?");
+    if (!confirm.isConfirmed) return;
+
+    const success = await removeActivity(currentTrip.id, itemId);
+    if (success) {
+      alertSuccess("Đã xóa hoạt động!");
+    } else {
+      alertError("Không thể xóa hoạt động.");
+    }
+  };
+
+  const handleSaveTrip = async () => {
+    if (!tripForm.tenLichTrinh.trim()) {
+      alertError("Vui lòng điền tên chuyến đi!");
+      return;
+    }
+
+    if (isEditingTrip && currentTrip) {
+      const success = await updateTrip(currentTrip.id, tripForm);
+      if (success) {
+        alertSuccess("Đã cập nhật chuyến đi!");
+        setShowTripModal(false);
+      } else {
+        alertError("Lỗi cập nhật chuyến đi.");
+      }
+    } else {
+      const newTrip = await createTrip(tripForm);
+      if (newTrip) {
+        alertSuccess("Đã khởi tạo chuyến đi mới!");
+        setShowTripModal(false);
+        fetchTripDetail(newTrip.id);
+      } else {
+        alertError("Lỗi khởi tạo chuyến đi.");
+      }
+    }
+  };
+
+  const handleDeleteTrip = async (tripId) => {
+    const confirm = await confirmAction("Xóa chuyến đi", "Tất cả ngày lịch trình sẽ bị xóa vĩnh viễn!");
+    if (!confirm.isConfirmed) return;
+
+    const success = await deleteTrip(tripId);
+    if (success) {
+      alertSuccess("Đã xóa chuyến đi thành công!");
+    } else {
+      alertError("Lỗi khi xóa chuyến đi.");
+    }
+  };
+
+  const handleCloneTrip = async (tripId) => {
+    const confirm = await confirmAction("Sao chép lịch trình", "Bạn muốn sao chép lịch trình này thành một bản nháp mới?");
+    if (!confirm.isConfirmed) return;
+
+    const cloned = await cloneTrip(tripId);
+    if (cloned) {
+      alertSuccess("Sao chép thành công!", `Đã tạo chuyến đi: ${cloned.tenLichTrinh}`);
+      fetchTripDetail(cloned.id);
+    } else {
+      alertError("Lỗi sao chép lịch trình.");
+    }
+  };
+
+  const getBadge = (item) => {
+    if (item.maKhachSan) return <span className="badge badge-info" style={{ backgroundColor: "#17a2b8" }}>🏨 Khách sạn</span>;
+    if (item.maNhaHang) return <span className="badge badge-warning" style={{ backgroundColor: "#ffc107", color: "#212529" }}>🍜 Nhà hàng</span>;
+    if (item.maHoatDong) return <span className="badge badge-success" style={{ backgroundColor: "#28a745" }}>🎪 Hoạt động</span>;
+    if (item.maPhuongTien) return <span className="badge badge-secondary" style={{ backgroundColor: "#6c757d" }}>🚗 Di chuyển</span>;
+    return <span className="badge badge-primary" style={{ backgroundColor: "#007bff" }}>📍 Địa điểm</span>;
+  };
+
+  if (!isAuthenticated()) {
+    return (
+      <div className="hero-wrap" style={{ backgroundImage: 'url("/images/bg_3.jpg")', minHeight: "100vh" }}>
+        <div className="overlay"></div>
+        <div className="container">
+          <div className="row slider-text align-items-center justify-content-center" style={{ minHeight: "100vh" }}>
+            <div className="col-md-8 text-center text-white" style={{ zIndex: 10 }}>
+              <h2 className="mb-4" style={{ fontWeight: 800 }}>Lập kế hoạch du lịch tự túc chuyên nghiệp</h2>
+              <p className="lead mb-5">Vui lòng đăng nhập để bắt đầu xây dựng, chia sẻ, và quản lý lịch trình chi tiết của bạn.</p>
+              <Link to="/login" className="btn btn-primary px-5 py-3" style={{ borderRadius: "30px", fontWeight: "700" }}>Đăng Nhập Ngay</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate statistics for Budget
+  const totalCost = currentTrip?.days?.reduce(
+    (acc, day) => acc + day.items?.reduce((dayAcc, item) => dayAcc + (item.chiPhiDuKien || 0), 0),
+    0
+  ) || 0;
+
+  return (
+    <>
+      {/* HERO BANNER */}
+      <div className="hero-wrap" style={{ backgroundImage: 'url("/images/bg_3.jpg")', height: "350px" }}>
+        <div className="overlay"></div>
+        <div className="container">
+          <div className="row slider-text align-items-center justify-content-center" style={{ height: "350px" }}>
+            <div className="col-md-9 text-center" style={{ zIndex: 10, paddingTop: "80px" }}>
+              <p className="breadcrumbs">
+                <span className="mr-2"><Link to="/" style={{ color: "#fff" }}>Trang chủ</Link></span>
+                <span style={{ color: "rgba(255,255,255,0.7)" }}>/ Lộ trình của tôi</span>
+              </p>
+              <h1 className="mb-3 bread text-white" style={{ fontSize: "40px", fontWeight: "800" }}>Travel Planner</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PLANNER CONTAINER */}
+      <section className="ftco-section bg-light" style={{ padding: "60px 0" }}>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="container-fluid px-md-5">
+            <div className="row">
+              
+              {/* SIDEBAR: Trip Switcher & Scratchpad Places */}
+              <div className="col-lg-3">
+                <div className="card shadow-sm border-0 mb-4" style={{ borderRadius: "16px" }}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="font-weight-bold m-0" style={{ color: "#2f3542" }}>Chuyến đi của tôi</h5>
+                      <button
+                        className="btn btn-sm btn-primary px-3"
+                        style={{ borderRadius: "20px" }}
+                        onClick={() => {
+                          setIsEditingTrip(false);
+                          setShowTripModal(true);
+                        }}
+                      >
+                        + Tạo mới
+                      </button>
+                    </div>
+
+                    <select
+                      className="form-control mb-3"
+                      style={{ borderRadius: "8px", height: "45px" }}
+                      value={currentTrip?.id || ""}
+                      onChange={(e) => {
+                        if (e.target.value) fetchTripDetail(parseInt(e.target.value));
+                      }}
+                    >
+                      <option value="" disabled>-- Chọn chuyến đi --</option>
+                      {userTrips.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.tenLichTrinh}
+                        </option>
+                      ))}
+                    </select>
+
+                    {currentTrip && (
+                      <div className="p-3 mb-2" style={{ backgroundColor: "#f8f9fa", borderRadius: "12px", borderLeft: "4px solid #e7ab3c" }}>
+                        <h6 className="font-weight-bold mb-2">{currentTrip.tenLichTrinh}</h6>
+                        <p className="text-muted small mb-2">{currentTrip.moTa || "Không có mô tả"}</p>
+                        <div className="small mb-1">📅 Khởi hành: {currentTrip.ngayBatDau || "Chưa chọn"}</div>
+                        <div className="small mb-2">💰 Tổng chi phí: <strong className="text-primary">{formatCurrency(totalCost)}</strong></div>
+                        <div className="d-flex gap-2">
+                          <button
+                            className="btn btn-xs btn-outline-secondary mr-2"
+                            onClick={() => {
+                              setIsEditingTrip(true);
+                              setShowTripModal(true);
+                            }}
+                          >
+                            ✏️ Sửa
+                          </button>
+                          <button
+                            className="btn btn-xs btn-outline-info mr-2"
+                            onClick={() => handleCloneTrip(currentTrip.id)}
+                          >
+                            👥 Nhân bản
+                          </button>
+                          <button
+                            className="btn btn-xs btn-outline-danger"
+                            onClick={() => handleDeleteTrip(currentTrip.id)}
+                          >
+                            🗑️ Xóa
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* SCRATCHPAD PLACES */}
+                <div className="card shadow-sm border-0" style={{ borderRadius: "16px" }}>
+                  <div className="card-body">
+                    <h5 className="font-weight-bold mb-2" style={{ color: "#2f3542" }}>Địa điểm đã chọn</h5>
+                    <p className="text-muted small mb-3">Kéo thả các điểm nghỉ chân này vào ô kế hoạch từng ngày ở giữa:</p>
+
+                    {selectedPlaces.length === 0 ? (
+                      <div className="text-center py-4 text-muted small" style={{ border: "2px dashed #ddd", borderRadius: "12px" }}>
+                        Chưa có địa điểm nào được lưu.<br/>Tìm khách sạn hoặc danh lam thắng cảnh rồi bấm "Lưu vào kế hoạch" để đưa vào đây!
+                      </div>
+                    ) : (
+                      <Droppable droppableId="places" isDropDisabled={true}>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.droppableProps}>
+                            {selectedPlaces.map((place, index) => (
+                              <Draggable
+                                key={`${place.name}-${index}`}
+                                draggableId={`${place.name}-${index}`}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className="p-3 mb-2 bg-white border border-light shadow-xs"
+                                    style={{
+                                      borderRadius: "12px",
+                                      cursor: "grab",
+                                      userSelect: "none",
+                                      ...provided.draggableProps.style,
+                                    }}
+                                  >
+                                    <div className="d-flex justify-content-between align-items-start">
+                                      <strong className="small text-dark">📍 {place.name}</strong>
+                                      <span className="badge badge-light text-muted small" style={{ fontSize: "10px" }}>{place.type}</span>
+                                    </div>
+                                    <div className="text-muted small mt-1 text-truncate">{place.location}</div>
+                                    <div className="d-flex justify-content-between align-items-center mt-2">
+                                      <span className="text-primary font-weight-bold small">{place.price ? formatCurrency(place.price) : "Miễn phí"}</span>
+                                      <button
+                                        className="btn btn-xs btn-primary py-0"
+                                        onClick={() => setSelectedPlaceForModal(place)}
+                                      >
+                                        + Thêm
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    )}
+                  </div>
+                </div>
+
+                {/* AI RECOMMENDATIONS CARD */}
+                {currentTrip && (
+                  <div className="card shadow-sm border-0 mt-4" style={{ borderRadius: "16px", backgroundColor: "#fff" }}>
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-2">
+                        <span style={{ fontSize: "20px" }} className="mr-2">💡</span>
+                        <h5 className="font-weight-bold m-0" style={{ color: "#2f3542" }}>Gợi ý từ AI</h5>
+                      </div>
+                      <p className="text-muted small mb-3">Hệ thống gợi ý các điểm dừng chân phù hợp với phong cách và ngân sách chuyến đi của bạn:</p>
+
+                      {/* TABS */}
+                      <div className="d-flex justify-content-between mb-3 border-bottom pb-2" style={{ gap: "4px" }}>
+                        <button
+                          className={`btn btn-xs px-2 py-1 ${recTab === "hotels" ? "btn-primary font-weight-bold" : "btn-light text-muted"}`}
+                          style={{ borderRadius: "12px", fontSize: "11px" }}
+                          onClick={() => setRecTab("hotels")}
+                        >
+                          🏨 Khách sạn
+                        </button>
+                        <button
+                          className={`btn btn-xs px-2 py-1 ${recTab === "restaurants" ? "btn-primary font-weight-bold" : "btn-light text-muted"}`}
+                          style={{ borderRadius: "12px", fontSize: "11px" }}
+                          onClick={() => setRecTab("restaurants")}
+                        >
+                          🍽️ Nhà hàng
+                        </button>
+                        <button
+                          className={`btn btn-xs px-2 py-1 ${recTab === "activities" ? "btn-primary font-weight-bold" : "btn-light text-muted"}`}
+                          style={{ borderRadius: "12px", fontSize: "11px" }}
+                          onClick={() => setRecTab("activities")}
+                        >
+                          🎯 Hoạt động
+                        </button>
+                      </div>
+
+                      {recLoading ? (
+                        <div className="text-center py-4">
+                          <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
+                          <span className="small text-muted ml-2">AI đang tìm kiếm...</span>
+                        </div>
+                      ) : recommendations ? (
+                        <div>
+                          {recTab === "hotels" && (
+                            <div>
+                              {recommendations.hotels?.length > 0 ? (
+                                recommendations.hotels.map((item) => (
+                                  <div key={item.id} className="p-2 mb-2 bg-light rounded border border-light d-flex align-items-center justify-content-between">
+                                    <div className="min-width-0 mr-2 flex-grow-1">
+                                      <strong className="small text-dark text-truncate d-block" style={{maxWidth: "150px"}}>🏢 {item.name}</strong>
+                                      <div className="small text-muted text-truncate" style={{maxWidth: "150px"}}>📍 {item.province}</div>
+                                      <div className="small text-primary font-weight-bold">{item.price ? formatCurrency(item.price) : "Liên hệ"}</div>
+                                    </div>
+                                    <button
+                                      className="btn btn-xs btn-outline-primary px-2 py-1"
+                                      style={{ borderRadius: "12px", fontSize: "10px" }}
+                                      onClick={() => addRecommendedToScratchpad(item, "hotels")}
+                                    >
+                                      + Lưu
+                                    </button>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-muted small text-center">Không tìm thấy khách sạn phù hợp.</p>
+                              )}
+                            </div>
+                          )}
+
+                          {recTab === "restaurants" && (
+                            <div>
+                              {recommendations.restaurants?.length > 0 ? (
+                                recommendations.restaurants.map((item) => (
+                                  <div key={item.id} className="p-2 mb-2 bg-light rounded border border-light d-flex align-items-center justify-content-between">
+                                    <div className="min-width-0 mr-2 flex-grow-1">
+                                      <strong className="small text-dark text-truncate d-block" style={{maxWidth: "150px"}}>🍽️ {item.name}</strong>
+                                      <div className="small text-muted text-truncate" style={{maxWidth: "150px"}}>📍 {item.province}</div>
+                                      <div className="small text-warning">⭐️ {item.rating || 5.0}</div>
+                                    </div>
+                                    <button
+                                      className="btn btn-xs btn-outline-primary px-2 py-1"
+                                      style={{ borderRadius: "12px", fontSize: "10px" }}
+                                      onClick={() => addRecommendedToScratchpad(item, "restaurants")}
+                                    >
+                                      + Lưu
+                                    </button>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-muted small text-center">Không tìm thấy nhà hàng phù hợp.</p>
+                              )}
+                            </div>
+                          )}
+
+                          {recTab === "activities" && (
+                            <div>
+                              {recommendations.activities?.length > 0 ? (
+                                recommendations.activities.map((item) => (
+                                  <div key={item.id} className="p-2 mb-2 bg-light rounded border border-light d-flex align-items-center justify-content-between">
+                                    <div className="min-width-0 mr-2 flex-grow-1">
+                                      <strong className="small text-dark text-truncate d-block" style={{maxWidth: "150px"}}>🎯 {item.name}</strong>
+                                      <div className="small text-muted text-truncate" style={{maxWidth: "150px"}}>📍 {item.province}</div>
+                                      <div className="small text-primary font-weight-bold">{item.price ? formatCurrency(item.price) : "Miễn phí"}</div>
+                                    </div>
+                                    <button
+                                      className="btn btn-xs btn-outline-primary px-2 py-1"
+                                      style={{ borderRadius: "12px", fontSize: "10px" }}
+                                      onClick={() => addRecommendedToScratchpad(item, "activities")}
+                                    >
+                                      + Lưu
+                                    </button>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-muted small text-center">Không tìm thấy hoạt động phù hợp.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-muted small text-center">Vui lòng thiết lập ngân sách và phong cách để nhận gợi ý.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* TIMELINE CONTENT */}
+              <div className="col-lg-5">
+                <div className="d-flex gap-2 mb-4">
+                  <button
+                    className={`btn px-4 py-2 mr-2 ${activeTab === "timeline" ? "btn-primary shadow-sm" : "btn-white text-secondary"}`}
+                    style={{ borderRadius: "20px", fontWeight: "700" }}
+                    onClick={() => setActiveTab("timeline")}
+                  >
+                    ⏱️ Dòng thời gian (Timeline)
+                  </button>
+                  <button
+                    className={`btn px-4 py-2 ${activeTab === "budget" ? "btn-primary shadow-sm" : "btn-white text-secondary"}`}
+                    style={{ borderRadius: "20px", fontWeight: "700" }}
+                    onClick={() => setActiveTab("budget")}
+                  >
+                    📊 Bảng chi phí (Budget)
+                  </button>
+                </div>
+
+                {!currentTrip ? (
+                  <div className="card shadow-sm border-0 text-center py-5" style={{ borderRadius: "16px" }}>
+                    <div className="card-body py-5">
+                      <div className="display-4 text-muted mb-3">🎒</div>
+                      <h4 className="font-weight-bold">Bắt đầu chuyến hành trình tự túc</h4>
+                      <p className="text-muted mb-4 max-width-350 mx-auto">Tạo một lịch trình mới hoặc chọn chuyến đi có sẵn từ danh sách để thiết kế dải thời gian chi tiết của bạn.</p>
+                      <button
+                        className="btn btn-primary px-4 py-2 font-weight-bold"
+                        style={{ borderRadius: "30px" }}
+                        onClick={() => {
+                          setIsEditingTrip(false);
+                          setShowTripModal(true);
+                        }}
+                      >
+                        Tạo Lịch Trình Ngay
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* BUDGET TAB */}
+                    {activeTab === "budget" && (
+                      <div className="card shadow-sm border-0 p-4" style={{ borderRadius: "16px" }}>
+                        <h4 className="font-weight-bold mb-3" style={{ color: "#2f3542" }}>Quản lý chi phí chi tiết</h4>
+                        <p className="text-muted small mb-4">Danh sách ước lượng các chi phí đã được liên kết với lịch trình chuyến đi của bạn.</p>
+                        
+                        <div className="table-responsive">
+                          <table className="table table-borderless table-striped">
+                            <thead>
+                              <tr className="text-muted small">
+                                <th>Hoạt động</th>
+                                <th>Loại</th>
+                                <th>Chi phí dự kiến</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {currentTrip.days?.flatMap(d => d.items || [])?.length === 0 ? (
+                                <tr>
+                                  <td colSpan="3" className="text-center py-4 text-muted">Chưa có chi phí nào được khai báo. Kéo địa điểm vào timeline để hệ thống tự động tổng hợp.</td>
+                                </tr>
+                              ) : (
+                                currentTrip.days?.flatMap(d => d.items || [])?.map((item) => (
+                                  <tr key={item.id}>
+                                    <td className="font-weight-bold small">{item.tieuDe}</td>
+                                    <td>{getBadge(item)}</td>
+                                    <td className="text-right text-primary font-weight-bold">{formatCurrency(item.chiPhiDuKien)}</td>
+                                  </tr>
+                                ))
+                              )}
+                              <tr className="bg-light font-weight-bold">
+                                <td colSpan="2">Tổng cộng dự kiến:</td>
+                                <td className="text-right text-danger" style={{ fontSize: "18px" }}>{formatCurrency(totalCost)}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TIMELINE TAB */}
+                    {activeTab === "timeline" && (
+                      <div>
+                        {currentTrip.days?.map((dayItem) => (
+                          <div key={dayItem.maNgay} className="card shadow-sm border-0 mb-4" style={{ borderRadius: "16px" }}>
+                            <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                              <div>
+                                <h4 className="font-weight-bold m-0" style={{ color: "#2f3542" }}>Ngày {dayItem.soThuTu}</h4>
+                                <small className="text-muted">{dayItem.ngay || "Chưa thiết lập ngày"}</small>
+                              </div>
+                              <span className="badge badge-light px-3 py-2 text-dark font-weight-bold" style={{ borderRadius: "15px" }}>
+                                {dayItem.items?.length || 0} hoạt động
+                              </span>
+                            </div>
+
+                            <div className="card-body">
+                              <Droppable droppableId={dayItem.maNgay.toString()}>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.droppableProps}
+                                    style={{
+                                      minHeight: "120px",
+                                      padding: "12px",
+                                      borderRadius: "12px",
+                                      backgroundColor: "#f8f9fa",
+                                      border: "2px dashed #ddd",
+                                      transition: "0.2s",
+                                    }}
+                                  >
+                                    {(!dayItem.items || dayItem.items.length === 0) ? (
+                                      <div className="text-center py-5 text-muted small">
+                                        📥 Kéo địa điểm từ bên trái thả vào đây để xây dựng timeline
+                                      </div>
+                                    ) : (
+                                      dayItem.items.map((item, index) => (
+                                        <Draggable
+                                          key={item.id.toString()}
+                                          draggableId={item.id.toString()}
+                                          index={index}
+                                        >
+                                          {(provided) => (
+                                            <div
+                                              ref={provided.innerRef}
+                                              {...provided.draggableProps}
+                                              className="card border-0 shadow-xs mb-3"
+                                              style={{
+                                                borderRadius: "12px",
+                                                ...provided.draggableProps.style,
+                                              }}
+                                            >
+                                              <div className="card-body p-3 d-flex align-items-center">
+                                                {/* DRAG HANDLE */}
+                                                <div
+                                                  {...provided.dragHandleProps}
+                                                  className="text-muted mr-3"
+                                                  style={{ fontSize: "20px", cursor: "grab" }}
+                                                >
+                                                  ☰
+                                                </div>
+
+                                                {/* TIME PICKER */}
+                                                <div className="mr-3" style={{ minWidth: "90px" }}>
+                                                  <span className="badge badge-light font-weight-bold p-2 text-dark" style={{ fontSize: "13px" }}>
+                                                    ⏰ {item.startTime?.substring(0, 5) || "08:00"}
+                                                  </span>
+                                                </div>
+
+                                                {/* DETAILS */}
+                                                <div className="flex-grow-1 min-width-0 mr-2">
+                                                  <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                                    <h6 className="font-weight-bold m-0 text-truncate" style={{ fontSize: "15px" }}>{item.tieuDe}</h6>
+                                                    {getBadge(item)}
+                                                  </div>
+                                                  <p className="text-muted small m-0 text-truncate">📍 {item.ghiChu || "Không có địa chỉ"}</p>
+                                                </div>
+
+                                                {/* ACTIONS */}
+                                                <div>
+                                                  <button
+                                                    className="btn btn-xs btn-outline-danger p-1"
+                                                    style={{ borderRadius: "50%" }}
+                                                    onClick={() => handleDeleteItem(item.id)}
+                                                  >
+                                                    ✕
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          )}
+                                        </Draggable>
+                                      ))
+                                    )}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* GOOGLE MAPS COMPONENT */}
+              <div className="col-lg-4">
+                <div style={{ position: "sticky", top: "120px" }}>
+                  <iframe
+                    title="map"
+                    width="100%"
+                    height="600"
+                    style={{
+                      border: 0,
+                      borderRadius: "20px",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                    }}
+                    loading="lazy"
+                    allowFullScreen
+                    src={`https://www.google.com/maps?q=${currentTrip?.tenLichTrinh || "Viet Nam"}&output=embed`}
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </DragDropContext>
+
+        {/* TRIP EDIT/CREATE MODAL */}
+        {showTripModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="card shadow-lg p-4" style={{ borderRadius: "20px", width: "500px", maxWidth: "90%", maxHeight: "90vh", overflowY: "auto" }}>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="font-weight-bold m-0">{isEditingTrip ? "Cấu hình lịch trình" : "Khởi tạo lịch trình mới"}</h4>
+                <button className="btn btn-link text-muted font-weight-bold" style={{ fontSize: "20px", textDecoration: "none" }} onClick={() => setShowTripModal(false)}>✕</button>
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="small font-weight-bold">Tên hành trình *</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  style={{ borderRadius: "8px" }}
+                  placeholder="Ví dụ: Du hí Đà Nẵng 3 ngày 2 đêm"
+                  value={tripForm.tenLichTrinh}
+                  onChange={(e) => setTripForm({ ...tripForm, tenLichTrinh: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="small font-weight-bold">Mô tả hành trình</label>
+                <textarea
+                  className="form-control"
+                  rows="3"
+                  style={{ borderRadius: "8px" }}
+                  placeholder="Chia sẻ ngắn gọn mục tiêu của chuyến đi..."
+                  value={tripForm.moTa}
+                  onChange={(e) => setTripForm({ ...tripForm, moTa: e.target.value })}
+                />
+              </div>
+
+              <div className="row">
+                <div className="col-6 form-group mb-3">
+                  <label className="small font-weight-bold">Ngày đi</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    style={{ borderRadius: "8px" }}
+                    value={tripForm.ngayBatDau}
+                    onChange={(e) => setTripForm({ ...tripForm, ngayBatDau: e.target.value })}
+                  />
+                </div>
+                <div className="col-6 form-group mb-3">
+                  <label className="small font-weight-bold">Ngày về</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    style={{ borderRadius: "8px" }}
+                    value={tripForm.ngayKetThuc}
+                    onChange={(e) => setTripForm({ ...tripForm, ngayKetThuc: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="small font-weight-bold">Phong cách du lịch</label>
+                <select
+                  className="form-control"
+                  style={{ borderRadius: "8px" }}
+                  value={tripForm.maPhongCach}
+                  onChange={(e) => setTripForm({ ...tripForm, maPhongCach: parseInt(e.target.value) })}
+                >
+                  {metadata.styles.map((s) => (
+                    <option key={s.id} value={s.id}>{s.tenPhongCach}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="small font-weight-bold">Đối tượng đồng hành</label>
+                <select
+                  className="form-control"
+                  style={{ borderRadius: "8px" }}
+                  value={tripForm.maDoiTuong}
+                  onChange={(e) => setTripForm({ ...tripForm, maDoiTuong: parseInt(e.target.value) })}
+                >
+                  {metadata.targets.map((t) => (
+                    <option key={t.id} value={t.id}>{t.tenDoiTuong}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group mb-3">
+                <label className="small font-weight-bold">Định mức ngân sách</label>
+                <select
+                  className="form-control"
+                  style={{ borderRadius: "8px" }}
+                  value={tripForm.maMucNganSach}
+                  onChange={(e) => setTripForm({ ...tripForm, maMucNganSach: parseInt(e.target.value) })}
+                >
+                  {metadata.budgets.map((b) => (
+                    <option key={b.id} value={b.id}>{b.tenMuc}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group mb-4">
+                <div className="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    className="custom-control-input"
+                    id="laCongKhai"
+                    checked={tripForm.laCongKhai}
+                    onChange={(e) => setTripForm({ ...tripForm, laCongKhai: e.target.checked })}
+                  />
+                  <label className="custom-control-label small font-weight-bold" htmlFor="laCongKhai">Công khai lộ trình này cho cộng đồng</label>
+                </div>
+              </div>
+
+              <button
+                className="btn btn-primary btn-block font-weight-bold py-3"
+                style={{ borderRadius: "30px" }}
+                onClick={handleSaveTrip}
+              >
+                {isEditingTrip ? "Lưu thay đổi" : "Tạo lịch trình"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* DIALOG ADDING FROM BUTTON CLICK */}
+        {selectedPlaceForModal && currentTrip && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="card shadow-lg p-4" style={{ borderRadius: "20px", width: "400px", maxWidth: "90%", margin: "auto" }}>
+              <h5 className="font-weight-bold mb-3">Thêm vào lịch trình</h5>
+              
+              <div className="p-3 mb-3" style={{ backgroundColor: "#f8f9fa", borderRadius: "12px" }}>
+                <strong>📍 {selectedPlaceForModal.name}</strong>
+                <div className="small text-muted">{selectedPlaceForModal.location}</div>
+              </div>
+
+              <p className="small text-muted font-weight-bold mb-2">Chọn ngày để thêm hoạt động:</p>
+              {currentTrip.days?.map((day) => (
+                <button
+                  key={day.maNgay}
+                  className="btn btn-light btn-block text-left mb-2 px-3 py-2 font-weight-bold"
+                  style={{ borderRadius: "10px" }}
+                  onClick={() => {
+                    handleAddPlaceToDay(selectedPlaceForModal, day.maNgay);
+                    setSelectedPlaceForModal(null);
+                  }}
+                >
+                  Ngày {day.soThuTu} — {day.ngay || "Chưa chọn"}
+                </button>
+              ))}
+
+              <button
+                className="btn btn-outline-secondary btn-block font-weight-bold mt-3"
+                style={{ borderRadius: "30px" }}
+                onClick={() => setSelectedPlaceForModal(null)}
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+    </>
+  );
+}
+
+export default Itinerary;

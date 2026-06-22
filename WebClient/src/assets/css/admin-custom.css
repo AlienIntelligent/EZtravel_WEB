@@ -165,3 +165,146 @@ body.admin-layout {
     width: 1.6rem !important;
   }
 }
+
+/* Provider Pages - Icon Size Fixes */
+.provider-dashboard-content svg,
+.provider-page-content svg {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  display: inline-block !important;
+}
+
+.provider-dashboard-content .w-5,
+.provider-page-content .w-5 {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  max-width: 1.25rem !important;
+  max-height: 1.25rem !important;
+  min-width: 1.25rem !important;
+  min-height: 1.25rem !important;
+}
+
+.provider-dashboard-content .w-6,
+.provider-page-content .w-6 {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  max-width: 1.5rem !important;
+  max-height: 1.5rem !important;
+  min-width: 1.5rem !important;
+  min-height: 1.5rem !important;
+}
+
+.provider-dashboard-content .w-8,
+.provider-page-content .w-8 {
+  width: 2rem !important;
+  height: 2rem !important;
+  max-width: 2rem !important;
+  max-height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+}
+
+/* Override AdminLTE icon sizing for provider pages */
+.provider-dashboard-content .nav-icon,
+.provider-page-content .nav-icon {
+  width: 1.25rem !important;
+  margin-right: 0.5rem !important;
+  max-width: 1.25rem !important;
+  min-width: 1.25rem !important;
+}
+
+/* Fix emoji icons size */
+.provider-dashboard-content,
+.provider-page-content {
+  font-size: 1rem !important;
+}
+
+/* Override FontAwesome icon sizes in provider pages */
+.provider-dashboard-content .fas,
+.provider-dashboard-content .far,
+.provider-dashboard-content .fab,
+.provider-page-content .fas,
+.provider-page-content .far,
+.provider-page-content .fab {
+  font-size: inherit !important;
+}
+
+/* Fix icon sizes in cards */
+.provider-dashboard-content .bg-green-100 svg,
+.provider-dashboard-content .bg-blue-100 svg,
+.provider-dashboard-content .bg-purple-100 svg,
+.provider-dashboard-content .bg-orange-100 svg,
+.provider-dashboard-content .bg-yellow-100 svg,
+.provider-page-content .bg-green-100 svg,
+.provider-page-content .bg-blue-100 svg,
+.provider-page-content .bg-purple-100 svg,
+.provider-page-content .bg-orange-100 svg,
+.provider-page-content .bg-yellow-100 svg {
+  width: 2rem !important;
+  height: 2rem !important;
+  max-width: 2rem !important;
+  max-height: 2rem !important;
+}
+
+/* Force icon sizes in all contexts */
+.provider-dashboard-content button svg,
+.provider-page-content button svg,
+.provider-dashboard-content a svg,
+.provider-page-content a svg {
+  width: auto !important;
+  height: auto !important;
+}
+
+.provider-dashboard-content button .w-5,
+.provider-page-content button .w-5,
+.provider-dashboard-content a .w-5,
+.provider-page-content a .w-5 {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+.provider-dashboard-content button .w-6,
+.provider-page-content button .w-6,
+.provider-dashboard-content a .w-6,
+.provider-page-content a .w-6 {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+/* Override AdminLTE specific icon classes */
+.provider-dashboard-content .brand-link svg,
+.provider-page-content .brand-link svg,
+.provider-dashboard-content .main-header svg,
+.provider-page-content .main-header svg {
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Override all SVG icons in provider content */
+.provider-dashboard-content * svg,
+.provider-page-content * svg {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Then re-apply specific sizes */
+.provider-dashboard-content .w-5 svg,
+.provider-page-content .w-5 svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+.provider-dashboard-content .w-6 svg,
+.provider-page-content .w-6 svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+.provider-dashboard-content .w-8 svg,
+.provider-page-content .w-8 svg {
+  width: 2rem !important;
+  height: 2rem !important;
+}
