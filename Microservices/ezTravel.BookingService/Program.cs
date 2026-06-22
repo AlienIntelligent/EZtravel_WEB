@@ -1,6 +1,7 @@
 using System.Text;
 using ezTravel.Repository;
 using ezTravel.Services;
+using ezTravel.BookingService.ProviderDocuments;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add Infrastructure & Services
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices();
+builder.Services.AddSingleton<IProviderDocumentStorage, LocalProviderDocumentStorage>();
 
 // 2. Add Controllers & Swagger
 builder.Services.AddControllers();

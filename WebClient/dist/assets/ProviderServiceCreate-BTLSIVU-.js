@@ -1,0 +1,1 @@
+import{p as e}from"./createLucideIcon-BiVnPl0J.js";import{t}from"./ProviderServiceFormPage-D5UJl_4c.js";var n=e();function r(){return(0,n.jsx)(t,{mode:`create`})}export{r as default};

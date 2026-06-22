@@ -1,0 +1,62 @@
+# FINAL DOCUMENT INVENTORY
+
+## 1. Root Files
+- `ARCHITECTURE_REVIEW.md`
+- `COMMUNITY_API_INVENTORY.md`
+- `COMMUNITY_AUDIT_REPORT.md`
+- `COMMUNITY_GAP_ANALYSIS.md`
+- `COMMUNITY_IMPLEMENTATION_REPORT.md`
+- `CURRENT_STATE_ANALYSIS.md`
+- `DEPENDENCY_AUDIT.md`
+- `DESIGN_SYSTEM_AUDIT.md`
+- `DOCUMENT_INDEX.md`
+- `DOCUMENT_MOVE_PLAN_FINAL.md`
+- `DOCUMENT_REFERENCE_RISK_REPORT.md`
+- `DOCUMENT_STRUCTURE_V2.md`
+- `DTO_PAYLOAD_AUDIT.md`
+- `DTO_VALIDATION_AUDIT.md`
+- `ESLINT_DEBT_REPORT.md`
+- `FEED_DETAIL_AUDIT.md`
+- `IMPORT_AUDIT_REPORT.md`
+- `JSX_MIGRATION_AUDIT.md`
+- `JSX_UI_MIGRATION_REPORT.md`
+- `LIKE_API_STRATEGY.md`
+- `MANUAL_CRUD_VERIFICATION.md`
+- `MULTI_AGENT_AUDIT.md`
+- `NOTIFICATION_INTEGRATION_AUDIT.md`
+- `NOTIFICATION_STRATEGY.md`
+- `POST_JSX_FILE_INVENTORY.md`
+- `POST_JSX_MIGRATION_AUDIT.md`
+- `PROVIDER_SERVICE_AUDIT.md`
+- `READING_ORDER.md`
+- `REDUX_AUDIT_REPORT.md`
+- `REVIEW_FLOW_AUDIT.md`
+- `ROADMAP_V2.md`
+- `ROUTING_AUDIT_REPORT.md`
+- `RTK_QUERY_AUDIT_REPORT.md`
+- `RULES.md`
+- `SPRINT01_GAP_ANALYSIS.md`
+- `SPRINT01_IMPLEMENTATION_PLAN.md`
+- `SPRINT_01_COMPLETION_REPORT.md`
+- `SPRINT_01_EXECUTION_SPEC.md`
+- `SPRINT_01_FINAL_SIGNOFF.md`
+- `SPRINT_02_FINAL_SIGNOFF.md`
+- `SPRINT_02_IMPLEMENTATION_PLAN.md`
+- `SYSTEM_INVENTORY_REPORT.md`
+- `SYSTEM_REDESIGN_PROPOSAL.md`
+- `TECH_DEBT_BACKLOG.md`
+- `README.md` (Giả định có)
+- `README.old.md`
+
+## 2. Docs Files
+Thư mục `docs/` hiện chứa các file đã được COPY vào trong đợt Safe Mode Reorganization, và bao gồm các phân loại:
+- `docs/analysis/`
+- `docs/architecture/`
+- `docs/archive/`
+- `docs/audits/`
+- `docs/governance/`
+- `docs/migrations/`
+- `docs/project/`
+- `docs/sprints/`
+
+(Tổng cộng khoảng 70 file nằm rải rác bên trong).

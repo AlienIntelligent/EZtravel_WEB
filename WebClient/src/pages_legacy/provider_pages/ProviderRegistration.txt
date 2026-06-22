@@ -1,0 +1,641 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { providerApi } from "../../api";
+
+const ProviderRegistration = () => {
+  const [formData, setFormData] = useState({
+    // Thông tin doanh nghiệp
+    businessName: "",
+    businessType: "",
+    taxCode: "",
+    establishedYear: "",
+    
+    // Thông tin người liên hệ
+    contactName: "",
+    position: "",
+    email: "",
+    phone: "",
+    
+    // Địa chỉ
+    address: "",
+    province: "",
+    district: "",
+    
+    // Loại dịch vụ cung cấp
+    serviceTypes: {
+      hotel: false,
+      restaurant: false,
+      activity: false,
+      transportation: false,
+    },
+    
+    // Mô tả
+    description: "",
+    
+    // Thông tin tài khoản
+    username: "",
+    password: "",
+    confirmPassword: "",
+    
+    // Đồng ý điều khoản
+    agreeTerms: false,
+  });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    
+    if (type === "checkbox") {
+      if (name === "agreeTerms") {
+        setFormData({ ...formData, [name]: checked });
+      } else {
+        // For service types checkboxes
+        setFormData({
+          ...formData,
+          serviceTypes: { ...formData.serviceTypes, [name]: checked },
+        });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validate required fields
+    if (!formData.businessName.trim()) {
+      newErrors.businessName = "Vui lòng nhập tên doanh nghiệp";
+    }
+    if (!formData.businessType) {
+      newErrors.businessType = "Vui lòng chọn loại hình doanh nghiệp";
+    }
+    if (!formData.contactName.trim()) {
+      newErrors.contactName = "Vui lòng nhập tên người liên hệ";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "Vui lòng nhập email";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email không hợp lệ";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Vui lòng nhập số điện thoại";
+    } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone = "Số điện thoại không hợp lệ";
+    }
+    if (!formData.address.trim()) {
+      newErrors.address = "Vui lòng nhập địa chỉ";
+    }
+    if (!formData.province) {
+      newErrors.province = "Vui lòng chọn tỉnh/thành phố";
+    }
+    
+    // Validate at least one service type is selected
+    const hasServiceType = Object.values(formData.serviceTypes).some(Boolean);
+    if (!hasServiceType) {
+      newErrors.serviceTypes = "Vui lòng chọn ít nhất một loại dịch vụ";
+    }
+    
+    // Validate account fields
+    if (!formData.username.trim()) {
+      newErrors.username = "Vui lòng nhập tên đăng nhập";
+    }
+    if (!formData.password) {
+      newErrors.password = "Vui lòng nhập mật khẩu";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
+    }
+    
+    if (!formData.agreeTerms) {
+      newErrors.agreeTerms = "Vui lòng đồng ý với điều khoản và điều kiện";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setSubmitting(true);
+    
+    try {
+      const payload = {
+        tenNhaCungCap: formData.businessName,
+        maSoThue: formData.taxCode,
+        diaChi: `${formData.address}, ${formData.district}, ${formData.province}`,
+        nguoiDaiDien: formData.contactName,
+        soDienThoai: formData.phone,
+        email: formData.email,
+        linhVuc: Object.keys(formData.serviceTypes).filter(k => formData.serviceTypes[k]).join(", ")
+      };
+      
+      await providerApi.create(payload);
+      
+      setTimeout(() => {
+        setSubmitting(false);
+        alert("Đăng ký thành công! Chúng tôi sẽ liên hệ với bạn trong vòng 24-48 giờ để xác nhận.");
+        // Reset form or redirect
+      }, 1000);
+    } catch (error) {
+      console.error("Lỗi khi đăng ký:", error);
+      alert("Đăng ký thất bại. Vui lòng thử lại!");
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="container-fluid p-0">
+      <div className="mb-4">
+        <h1 className="h3">
+          <strong>Đăng ký</strong> Nhà Cung Cấp Dịch Vụ
+        </h1>
+        <p className="text-muted">
+          Tham gia mạng lưới đối tác của EZtravel để mở rộng kinh doanh
+        </p>
+      </div>
+
+      <div className="row">
+        <div className="col-12">
+          <div className="card">
+            <div className="card-header">
+              <h5 className="card-title mb-0">Thông tin đăng ký</h5>
+            </div>
+            <div className="card-body">
+              <form onSubmit={handleSubmit}>
+                {/* Section 1: Thông tin doanh nghiệp */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="building"></i>
+                    Thông tin doanh nghiệp
+                  </h6>
+                  
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Tên doanh nghiệp <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.businessName ? "is-invalid" : ""}`}
+                        placeholder="Nhập tên doanh nghiệp"
+                      />
+                      {errors.businessName && (
+                        <div className="invalid-feedback">{errors.businessName}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Loại hình doanh nghiệp <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        name="businessType"
+                        value={formData.businessType}
+                        onChange={handleInputChange}
+                        className={`form-select ${errors.businessType ? "is-invalid" : ""}`}
+                      >
+                        <option value="">Chọn loại hình</option>
+                        <option value="company">Công ty TNHH</option>
+                        <option value="joint_stock">Công ty Cổ phần</option>
+                        <option value="individual">Hộ kinh doanh cá thể</option>
+                        <option value="cooperative">Hợp tác xã</option>
+                        <option value="other">Khác</option>
+                      </select>
+                      {errors.businessType && (
+                        <div className="invalid-feedback">{errors.businessType}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Mã số thuế</label>
+                      <input
+                        type="text"
+                        name="taxCode"
+                        value={formData.taxCode}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="Nhập mã số thuế (nếu có)"
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Năm thành lập</label>
+                      <input
+                        type="number"
+                        name="establishedYear"
+                        value={formData.establishedYear}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="Năm thành lập"
+                        min="1900"
+                        max={new Date().getFullYear()}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Thông tin người liên hệ */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="user"></i>
+                    Thông tin người liên hệ
+                  </h6>
+                  
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Họ và tên <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="contactName"
+                        value={formData.contactName}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.contactName ? "is-invalid" : ""}`}
+                        placeholder="Nhập họ và tên"
+                      />
+                      {errors.contactName && (
+                        <div className="invalid-feedback">{errors.contactName}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Chức vụ</label>
+                      <input
+                        type="text"
+                        name="position"
+                        value={formData.position}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="Ví dụ: Giám đốc, Quản lý..."
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Email <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                        placeholder="email@example.com"
+                      />
+                      {errors.email && (
+                        <div className="invalid-feedback">{errors.email}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Số điện thoại <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                        placeholder="0901234567"
+                      />
+                      {errors.phone && (
+                        <div className="invalid-feedback">{errors.phone}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Địa chỉ */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="map-pin"></i>
+                    Địa chỉ kinh doanh
+                  </h6>
+                  
+                  <div className="row">
+                    <div className="col-12 mb-3">
+                      <label className="form-label">
+                        Địa chỉ <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.address ? "is-invalid" : ""}`}
+                        placeholder="Số nhà, tên đường..."
+                      />
+                      {errors.address && (
+                        <div className="invalid-feedback">{errors.address}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">
+                        Tỉnh/Thành phố <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        name="province"
+                        value={formData.province}
+                        onChange={handleInputChange}
+                        className={`form-select ${errors.province ? "is-invalid" : ""}`}
+                      >
+                        <option value="">Chọn tỉnh/thành phố</option>
+                        <option value="Hanoi">Hà Nội</option>
+                        <option value="HCM">TP. Hồ Chí Minh</option>
+                        <option value="DaNang">Đà Nẵng</option>
+                        <option value="HaiPhong">Hải Phòng</option>
+                        <option value="CanTho">Cần Thơ</option>
+                        <option value="Hue">Thừa Thiên Huế</option>
+                        <option value="NgheAn">Nghệ An</option>
+                        <option value="KhanhHoa">Khánh Hòa</option>
+                        <option value="QuangNinh">Quảng Ninh</option>
+                        <option value="LamDong">Lâm Đồng</option>
+                        <option value="other">Tỉnh khác</option>
+                      </select>
+                      {errors.province && (
+                        <div className="invalid-feedback">{errors.province}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Quận/Huyện</label>
+                      <input
+                        type="text"
+                        name="district"
+                        value={formData.district}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="Nhập quận/huyện"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Loại dịch vụ */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="grid"></i>
+                    Loại dịch vụ cung cấp
+                  </h6>
+                  
+                  {errors.serviceTypes && (
+                    <div className="alert alert-danger">{errors.serviceTypes}</div>
+                  )}
+                  
+                  <div className="row">
+                    <div className="col-md-3 mb-3">
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              name="hotel"
+                              id="serviceHotel"
+                              checked={formData.serviceTypes.hotel}
+                              onChange={handleInputChange}
+                              className="form-check-input"
+                            />
+                            <label className="form-check-label" htmlFor="serviceHotel">
+                              <i className="align-middle me-2" data-feather="home"></i>
+                              Khách sạn/Lưu trú
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3 mb-3">
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              name="restaurant"
+                              id="serviceRestaurant"
+                              checked={formData.serviceTypes.restaurant}
+                              onChange={handleInputChange}
+                              className="form-check-input"
+                            />
+                            <label className="form-check-label" htmlFor="serviceRestaurant">
+                              <i className="align-middle me-2" data-feather="coffee"></i>
+                              Nhà hàng/Ẩm thực
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3 mb-3">
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              name="activity"
+                              id="serviceActivity"
+                              checked={formData.serviceTypes.activity}
+                              onChange={handleInputChange}
+                              className="form-check-input"
+                            />
+                            <label className="form-check-label" htmlFor="serviceActivity">
+                              <i className="align-middle me-2" data-feather="target"></i>
+                              Hoạt động/Tour
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3 mb-3">
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              name="transportation"
+                              id="serviceTransportation"
+                              checked={formData.serviceTypes.transportation}
+                              onChange={handleInputChange}
+                              className="form-check-input"
+                            />
+                            <label className="form-check-label" htmlFor="serviceTransportation">
+                              <i className="align-middle me-2" data-feather="truck"></i>
+                              Phương tiện/Vận chuyển
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 5: Mô tả */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="file-text"></i>
+                    Giới thiệu doanh nghiệp
+                  </h6>
+                  
+                  <div className="mb-3">
+                    <label className="form-label">Mô tả ngắn về doanh nghiệp</label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="form-control"
+                      placeholder="Giới thiệu về doanh nghiệp, kinh nghiệm, điểm mạnh..."
+                    />
+                  </div>
+                </div>
+
+                {/* Section 6: Thông tin tài khoản */}
+                <div className="mb-5">
+                  <h6 className="mb-3 pb-2 border-bottom">
+                    <i className="align-middle me-2" data-feather="lock"></i>
+                    Thông tin tài khoản đăng nhập
+                  </h6>
+                  
+                  <div className="row">
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">
+                        Tên đăng nhập <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.username ? "is-invalid" : ""}`}
+                        placeholder="Tên đăng nhập"
+                      />
+                      {errors.username && (
+                        <div className="invalid-feedback">{errors.username}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">
+                        Mật khẩu <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                        placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                      />
+                      {errors.password && (
+                        <div className="invalid-feedback">{errors.password}</div>
+                      )}
+                    </div>
+
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">
+                        Xác nhận mật khẩu <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
+                        placeholder="Nhập lại mật khẩu"
+                      />
+                      {errors.confirmPassword && (
+                        <div className="invalid-feedback">{errors.confirmPassword}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 7: Điều khoản */}
+                <div className="mb-4">
+                  <div className="form-check">
+                    <input
+                      type="checkbox"
+                      name="agreeTerms"
+                      id="agreeTerms"
+                      checked={formData.agreeTerms}
+                      onChange={handleInputChange}
+                      className={`form-check-input ${errors.agreeTerms ? "is-invalid" : ""}`}
+                    />
+                    <label className="form-check-label" htmlFor="agreeTerms">
+                      Tôi đồng ý với <Link to="/terms" className="text-primary">điều khoản và điều kiện</Link> của EZtravel
+                    </label>
+                    {errors.agreeTerms && (
+                      <div className="invalid-feedback d-block">{errors.agreeTerms}</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Submit buttons */}
+                <div className="d-flex justify-content-between align-items-center">
+                  <Link to="/about" className="btn btn-secondary">
+                    <i className="align-middle me-2" data-feather="arrow-left"></i>
+                    Quay lại
+                  </Link>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn btn-primary px-4"
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        <i className="align-middle me-2" data-feather="check"></i>
+                        Gửi đăng ký
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row mt-4">
+        <div className="col-12">
+          <div className="card bg-light">
+            <div className="card-body">
+              <h6 className="card-title mb-3">
+                <i className="align-middle me-2" data-feather="info"></i>
+                Lưu ý quan trọng
+              </h6>
+              <ul className="mb-0">
+                <li>Sau khi gửi đăng ký, chúng tôi sẽ xem xét và liên hệ với bạn trong vòng 24-48 giờ làm việc</li>
+                <li>Vui lòng cung cấp thông tin chính xác để expedite quá trình xét duyệt</li>
+                <li>Bạn có thể cần cung cấp thêm giấy tờ pháp lý để xác minh doanh nghiệp</li>
+                <li>Để được hỗ trợ nhanh hơn, vui lòng gọi hotline: 1900 xxxx</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProviderRegistration;

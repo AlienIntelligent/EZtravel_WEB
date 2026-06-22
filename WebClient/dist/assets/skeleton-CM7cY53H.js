@@ -1,0 +1,1 @@
+import{p as e}from"./createLucideIcon-BiVnPl0J.js";import{t}from"./cn-B7CvnRgy.js";var n=e();function r({className:e,...r}){return(0,n.jsx)(`div`,{className:t(`animate-pulse rounded-md bg-muted`,e),...r})}export{r as t};

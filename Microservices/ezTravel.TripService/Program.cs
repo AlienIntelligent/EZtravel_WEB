@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add Infrastructure & Services
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices();
+builder.Services.AddMemoryCache();
 
 // 2. Add Controllers & Swagger
 builder.Services.AddControllers();

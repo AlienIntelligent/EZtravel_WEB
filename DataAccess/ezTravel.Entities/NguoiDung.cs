@@ -1,56 +1,75 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ezTravel.Entities;
 
-[Table("NGUOI_DUNG")]
-[Index(nameof(Email), IsUnique = true)]
-public class NguoiDung
+public partial class NguoiDung
 {
-    [Key]
-    [Column("ma_nguoi_dung")]
     public int MaNguoiDung { get; set; }
 
-    [Column("ho_ten")]
-    [StringLength(100)]
     public string HoTen { get; set; } = null!;
 
-    [Column("mat_khau")]
-    [StringLength(255)]
-    public string MatKhau { get; set; } = null!;
-
-    [Column("email")]
-    [StringLength(100)]
     public string Email { get; set; } = null!;
 
-    [Column("so_dien_thoai")]
-    [StringLength(15)]
+    public string MatKhauHash { get; set; } = null!;
+
     public string? SoDienThoai { get; set; }
 
-    [Column("ngay_sinh")]
-    public DateOnly? NgaySinh { get; set; }
+    public string? AvatarUrl { get; set; }
 
-    [Column("avatar")]
-    [StringLength(255)]
-    public string? Avatar { get; set; }
+    public string Slug { get; set; } = null!;
 
-    [Column("vai_tro")]
-    [StringLength(20)]
-    public string? VaiTro { get; set; } = "Traveler";
+    public string? Bio { get; set; }
 
-    [Column("trang_thai")]
-    [StringLength(20)]
-    public string? TrangThai { get; set; } = "HoatDong";
+    public string VaiTro { get; set; } = null!;
 
-    [Column("ngay_tao", TypeName = "datetime")]
-    public DateTime? NgayTao { get; set; } = DateTime.UtcNow;
+    public string TrangThai { get; set; } = null!;
 
-    [Column("da_xoa")]
-    public bool? DaXoa { get; set; } = false;
+    public bool EmailDaXacThuc { get; set; }
 
-    // Navigation
-    public virtual ICollection<LichTrinh> LichTrinhs { get; set; } = new List<LichTrinh>();
-    public virtual ICollection<DonDat> DonDats { get; set; } = new List<DonDat>();
-    public virtual ICollection<DanhGia> DanhGias { get; set; } = new List<DanhGia>();
+    public DateTime NgayTao { get; set; }
+
+    public DateTime NgayCapNhat { get; set; }
+
+    public virtual ICollection<BaiViet> BaiViet { get; set; } = new List<BaiViet>();
+
+    public virtual ICollection<BaoCaoNoiDung> BaoCaoNoiDung { get; set; } = new List<BaoCaoNoiDung>();
+
+    public virtual ICollection<BinhLuanBaiViet> BinhLuanBaiViet { get; set; } = new List<BinhLuanBaiViet>();
+
+    public virtual ICollection<BinhLuanLichTrinh> BinhLuanLichTrinh { get; set; } = new List<BinhLuanLichTrinh>();
+
+    public virtual ICollection<ChiaSeLichTrinh> ChiaSeLichTrinh { get; set; } = new List<ChiaSeLichTrinh>();
+
+    public virtual ICollection<DangKyGoi> DangKyGoi { get; set; } = new List<DangKyGoi>();
+
+    public virtual ICollection<DanhGia> DanhGia { get; set; } = new List<DanhGia>();
+
+    public virtual ICollection<DuyetNoiDung> DuyetNoiDung { get; set; } = new List<DuyetNoiDung>();
+
+    public virtual ICollection<LichSuAi> LichSuAi { get; set; } = new List<LichSuAi>();
+
+    public virtual ICollection<LichSuClone> LichSuClone { get; set; } = new List<LichSuClone>();
+
+    public virtual ICollection<LichTrinh> LichTrinh { get; set; } = new List<LichTrinh>();
+
+    public virtual ICollection<LuuLichTrinh> LuuLichTrinh { get; set; } = new List<LuuLichTrinh>();
+
+    public virtual ICollection<NhaCungCap> NhaCungCapMaAdminDuyetNavigation { get; set; } = new List<NhaCungCap>();
+
+    public virtual ICollection<NhaCungCap> NhaCungCapMaNguoiDungNavigation { get; set; } = new List<NhaCungCap>();
+
+    public virtual ICollection<OtpXacThuc> OtpXacThuc { get; set; } = new List<OtpXacThuc>();
+
+    public virtual ICollection<RefreshToken> RefreshToken { get; set; } = new List<RefreshToken>();
+
+    public virtual ICollection<TheoDoiNguoiDung> TheoDoiNguoiDungMaNguoiDuocTheoDoiNavigation { get; set; } = new List<TheoDoiNguoiDung>();
+
+    public virtual ICollection<TheoDoiNguoiDung> TheoDoiNguoiDungMaNguoiTheoDoiNavigation { get; set; } = new List<TheoDoiNguoiDung>();
+
+    public virtual ICollection<ThichBaiViet> ThichBaiViet { get; set; } = new List<ThichBaiViet>();
+
+    public virtual ICollection<ThichLichTrinh> ThichLichTrinh { get; set; } = new List<ThichLichTrinh>();
+
+    public virtual ICollection<ThongBao> ThongBao { get; set; } = new List<ThongBao>();
 }

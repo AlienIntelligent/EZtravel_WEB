@@ -13,7 +13,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public GenericRepository(AppDbContext context)
     {
         _context = context;
-        _dbSet   = context.Set<T>();
+        _dbSet = context.Set<T>();
     }
 
     public async Task<T?> GetByIdAsync(int id)

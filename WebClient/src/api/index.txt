@@ -1,0 +1,130 @@
+import apiClient from "./client";
+import { authApi } from "./auth.api";
+
+// User API
+export const userApi = {
+  getAll: (params) => apiClient.get("/users", { params }),
+  getById: (id) => apiClient.get(`/users/${id}`),
+  create: (data) => apiClient.post("/users", data),
+  update: (id, data) => apiClient.put(`/users/${id}`, data),
+  delete: (id) => apiClient.delete(`/users/${id}`),
+};
+
+// Place API
+export const placeApi = {
+  // Tìm kiếm có phân trang: GET /api/places/search
+  search: (params) => apiClient.get("/places/search", { params }),
+  // Danh mục địa điểm: GET /api/places/categories
+  getCategories: () => apiClient.get("/places/categories"),
+  // Chi tiết: GET /api/places/{id}
+  getById: (id) => apiClient.get(`/places/${id}`),
+  // Lân cận: GET /api/places/nearby
+  getNearby: (lat, lng, radius = 5) =>
+    apiClient.get("/places/nearby", { params: { lat, lng, radius } }),
+  // CRUD
+  create: (data) => apiClient.post("/places", data),
+  update: (id, data) => apiClient.put(`/places/${id}`, data),
+  delete: (id) => apiClient.delete(`/places/${id}`),
+};
+
+// Hotel API
+export const hotelApi = {
+  search: (params) => apiClient.get("/places/hotels/search", { params }),
+  getById: (id) => apiClient.get(`/places/hotels/${id}`),
+  create: (data) => apiClient.post("/places/hotels", data),
+  update: (id, data) => apiClient.put(`/places/hotels/${id}`, data),
+  delete: (id) => apiClient.delete(`/places/hotels/${id}`),
+};
+
+// Restaurant API
+export const restaurantApi = {
+  search: (params) => apiClient.get("/places/restaurants/search", { params }),
+  getById: (id) => apiClient.get(`/places/restaurants/${id}`),
+  create: (data) => apiClient.post("/places/restaurants", data),
+  update: (id, data) => apiClient.put(`/places/restaurants/${id}`, data),
+  delete: (id) => apiClient.delete(`/places/restaurants/${id}`),
+};
+
+// Activity API
+export const activityApi = {
+  search: (params) => apiClient.get("/places/activities/search", { params }),
+  getById: (id) => apiClient.get(`/places/activities/${id}`),
+  create: (data) => apiClient.post("/places/activities", data),
+  update: (id, data) => apiClient.put(`/places/activities/${id}`, data),
+  delete: (id) => apiClient.delete(`/places/activities/${id}`),
+};
+
+// Vehicle API
+export const vehicleApi = {
+  search: (params) => apiClient.get("/places/vehicles/search", { params }),
+  getById: (id) => apiClient.get(`/places/vehicles/${id}`),
+  create: (data) => apiClient.post("/places/vehicles", data),
+  update: (id, data) => apiClient.put(`/places/vehicles/${id}`, data),
+  delete: (id) => apiClient.delete(`/places/vehicles/${id}`),
+};
+
+// Category API (Loại địa điểm - dùng /api/places/categories)
+export const categoryApi = {
+  // GET /api/places/categories
+  getAll: () => apiClient.get("/places/categories"),
+  // GET /api/places/categories/{id}
+  getById: (id) => apiClient.get(`/places/categories/${id}`),
+  // POST /api/places/categories
+  create: (data) => apiClient.post("/places/categories", data),
+  // PUT /api/places/categories/{id}
+  update: (id, data) => apiClient.put(`/places/categories/${id}`, data),
+  // DELETE /api/places/categories/{id}
+  delete: (id) => apiClient.delete(`/places/categories/${id}`),
+};
+// Trip API
+export const tripApi = {
+  getAll: (params) => apiClient.get("/trips", { params }),
+  getById: (id) => apiClient.get(`/trips/${id}`),
+  create: (data) => apiClient.post("/trips", data),
+  update: (id, data) => apiClient.put(`/trips/${id}`, data),
+  delete: (id) => apiClient.delete(`/trips/${id}`),
+
+  // Metadata lookups
+  getStyles: () => apiClient.get("/trips/metadata/styles"),
+  getTargets: () => apiClient.get("/trips/metadata/targets"),
+  getBudgets: () => apiClient.get("/trips/metadata/budgets"),
+
+  // Item management
+  addLocation: (tripId, data) =>
+    apiClient.post(`/trips/${tripId}/locations`, data),
+  removeLocation: (tripId, itemId) =>
+    apiClient.delete(`/trips/${tripId}/items/${itemId}`),
+  reorderItems: (tripId, data) =>
+    apiClient.put(`/trips/${tripId}/reorder`, data),
+  getCost: (tripId) => apiClient.get(`/trips/${tripId}/cost`),
+  clone: (tripId) => apiClient.post(`/trips/${tripId}/clone`),
+
+  // Recommendations Engine
+  getRecommendations: (data) => apiClient.post("/trips/recommendations", data),
+};
+
+
+// Review API
+export const reviewApi = {
+  post: (data) => apiClient.post("/reviews", data),
+  getByPlace: (placeId) => apiClient.get(`/reviews/place/${placeId}`),
+  getByService: (serviceId) => apiClient.get(`/reviews/service/${serviceId}`),
+};
+
+// Provider API
+export const providerApi = {
+  getById: (id) => apiClient.get(`/providers/${id}`),
+  getByUserId: (userId) => apiClient.get(`/providers/user/${userId}`),
+  getAll: () => apiClient.get("/providers"),
+  getPending: () => apiClient.get("/providers/pending"),
+  create: (data) => apiClient.post("/providers", data),
+  update: (id, data) => apiClient.put(`/providers/${id}`, data),
+  delete: (id) => apiClient.delete(`/providers/${id}`),
+  approve: (id, data) => apiClient.post(`/providers/${id}/approve`, data),
+  reject: (id, data) => apiClient.post(`/providers/${id}/reject`, data),
+};
+
+
+export const productApi = placeApi;
+
+export { apiClient, authApi };

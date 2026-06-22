@@ -1,0 +1,449 @@
+import React, { useMemo, useState, useEffect } from 'react';
+import { formatCurrency } from '../../utils/formatters';
+import { placeApi, hotelApi, restaurantApi } from '../../api';
+
+// ================= HELPERS =================
+const STATUS_BADGE = {
+    'Con phong':     { cls: 'badge-success', label: 'Còn chỗ' },
+    'Sap het phong': { cls: 'badge-warning', label: 'Sắp hết' },
+    'Het phong':     { cls: 'badge-danger',  label: 'Hết chỗ' },
+    Active:          { cls: 'badge-success', label: 'Hoạt động' },
+};
+
+const getBadge = (status) => STATUS_BADGE[status] || { cls: 'badge-secondary', label: status };
+
+const ALL_TYPES = ['Địa điểm', 'Hotel', 'Homestay', 'Resort', 'Lodge', 'Nhà hàng'];
+
+const PAGE_SIZE = 8;
+
+// ================= COMPONENT =================
+const Locations = () => {
+    const [rows, setRows]               = useState([]);
+    const [loading, setLoading]         = useState(true);
+    const [keyword, setKeyword]         = useState('');
+    const [filterType, setFilterType]   = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showModal, setShowModal]     = useState(false);
+    const [editing, setEditing]         = useState(null);
+    const [form, setForm]               = useState(emptyForm());
+
+    function emptyForm() {
+        return { name: '', type: 'Địa điểm', category: '', province: '', region: '', price: '', rating: '', description: '', status: 'Active', maTinhThanh: 1 };
+    }
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [pRes, hRes, rRes] = await Promise.all([
+                placeApi.search({ pageSize: 100 }),
+                hotelApi.search({ pageSize: 100 }),
+                restaurantApi.search({ pageSize: 100 })
+            ]);
+            
+            const places = pRes.data?.items || pRes.data || [];
+            const hotels = hRes.data?.items || hRes.data || [];
+            const restaurants = rRes.data?.items || rRes.data || [];
+
+            const placeRows = places.map(p => ({
+                id: `dest-${p.id}`, rawId: p.id, source: 'destination',
+                name: p.tenDiaDiem, type: 'Địa điểm', category: p.tags?.join(', ') || '—',
+                province: p.tenTinhThanh, region: '—', price: null,
+                rating: p.ratingAvg, reviews: p.totalReviews, description: p.moTa, status: 'Active'
+            }));
+
+            const hotelRows = hotels.map(h => ({
+                id: `hotel-${h.id}`, rawId: h.id, source: 'hotel',
+                name: h.tenKhachSan, type: 'Hotel', category: '—',
+                province: h.tenDiaDiem || '—', region: '—', price: h.giaTu,
+                rating: h.ratingAvg, reviews: h.totalReviews, description: h.moTa, status: 'Active'
+            }));
+
+            const restRows = restaurants.map(r => ({
+                id: `rest-${r.id}`, rawId: r.id, source: 'restaurant',
+                name: r.tenNhaHang, type: 'Nhà hàng', category: '—',
+                province: r.tenDiaDiem || '—', region: '—', price: r.giaTrungBinh,
+                rating: r.ratingAvg, reviews: r.totalReviews, description: r.moTa, status: 'Active'
+            }));
+
+            setRows([...placeRows, ...hotelRows, ...restRows]);
+        } catch (error) {
+            console.error("Lỗi khi tải dữ liệu:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    // ================= FILTER & PAGINATION =================
+    const filtered = useMemo(() => {
+        const kw = keyword.trim().toLowerCase();
+        return rows.filter((r) => {
+            const matchKw   = !kw || r.name?.toLowerCase().includes(kw) || r.province?.toLowerCase().includes(kw);
+            const matchType = !filterType || r.type === filterType;
+            return matchKw && matchType;
+        });
+    }, [rows, keyword, filterType]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+    const changePage   = (p) => setCurrentPage(Math.min(Math.max(1, p), totalPages));
+    const handleSearch = (val) => { setKeyword(val); setCurrentPage(1); };
+    const handleFilter = (val) => { setFilterType(val); setCurrentPage(1); };
+
+    // ================= MODAL =================
+    const openAdd = () => {
+        setEditing(null);
+        setForm(emptyForm());
+        setShowModal(true);
+    };
+
+    const openEdit = (row) => {
+        setEditing(row);
+        setForm({
+            name:        row.name,
+            type:        row.type,
+            category:    row.category,
+            province:    row.province,
+            region:      row.region,
+            price:       row.price ?? '',
+            rating:      row.rating,
+            description: row.description,
+            status:      row.status,
+            maTinhThanh: 1
+        });
+        setShowModal(true);
+    };
+
+    const closeModal = () => { setShowModal(false); setEditing(null); };
+
+    // ================= SAVE =================
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            if (editing) {
+                // Determine API based on source
+                if (editing.source === 'destination') {
+                    await placeApi.update(editing.rawId, {
+                        tenDiaDiem: form.name,
+                        moTa: form.description,
+                        maTinhThanh: 1 // Default
+                    });
+                } else if (editing.source === 'hotel') {
+                    await hotelApi.update(editing.rawId, {
+                        tenKhachSan: form.name,
+                        moTa: form.description,
+                        maDiaDiem: 1
+                    });
+                } else if (editing.source === 'restaurant') {
+                    await restaurantApi.update(editing.rawId, {
+                        tenNhaHang: form.name,
+                        moTa: form.description,
+                        maDiaDiem: 1
+                    });
+                }
+            } else {
+                if (form.type === 'Địa điểm') {
+                    await placeApi.create({
+                        tenDiaDiem: form.name,
+                        moTa: form.description,
+                        maTinhThanh: 1
+                    });
+                } else if (form.type === 'Nhà hàng') {
+                    await restaurantApi.create({
+                        tenNhaHang: form.name,
+                        moTa: form.description,
+                        maDiaDiem: 1
+                    });
+                } else {
+                    await hotelApi.create({
+                        tenKhachSan: form.name,
+                        moTa: form.description,
+                        maDiaDiem: 1
+                    });
+                }
+            }
+            closeModal();
+            fetchData();
+        } catch (error) {
+            console.error("Lỗi khi lưu:", error);
+            alert("Lưu thất bại!");
+        }
+    };
+
+    // ================= DELETE =================
+    const handleDelete = async (row) => {
+        if (!window.confirm('Bạn chắc chắn muốn xoá?')) return;
+        try {
+            if (row.source === 'destination') {
+                await placeApi.delete(row.rawId);
+            } else if (row.source === 'hotel') {
+                await hotelApi.delete(row.rawId);
+            } else if (row.source === 'restaurant') {
+                await restaurantApi.delete(row.rawId);
+            }
+            fetchData();
+        } catch (error) {
+            console.error("Lỗi khi xoá:", error);
+            alert("Xoá thất bại!");
+        }
+    };
+
+    // ================= RENDER =================
+    return (
+        <>
+            <div className="content-header">
+                <div className="container-fluid">
+                    <h1 className="m-0">Quản lý địa điểm & dịch vụ</h1>
+                </div>
+            </div>
+
+            <div className="container-fluid">
+                {/* FILTER BAR */}
+                <div className="card p-3 mb-3 d-flex flex-row flex-wrap" style={{ gap: '8px' }}>
+                    <input
+                        className="form-control"
+                        style={{ maxWidth: '320px' }}
+                        placeholder="Tìm theo tên, tỉnh thành..."
+                        value={keyword}
+                        onChange={(e) => handleSearch(e.target.value)}
+                    />
+                    <select
+                        className="form-control"
+                        style={{ maxWidth: '200px' }}
+                        value={filterType}
+                        onChange={(e) => handleFilter(e.target.value)}
+                    >
+                        <option value="">Tất cả loại</option>
+                        {ALL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <button className="btn btn-success ml-auto" onClick={openAdd}>
+                        <i className="fas fa-plus"></i> Thêm
+                    </button>
+                </div>
+
+                {/* TABLE */}
+                <div className="card">
+                    <div className="card-body p-0">
+                        {loading ? (
+                            <div className="text-center p-5">
+                                <div className="spinner-border text-primary" role="status"></div>
+                            </div>
+                        ) : (
+                            <table className="table table-bordered table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên</th>
+                                        <th>Loại</th>
+                                        <th>Tỉnh thành</th>
+                                        <th>Giá</th>
+                                        <th>Rating</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paginated.length === 0 ? (
+                                        <tr><td colSpan="8" className="text-center py-4">Không có dữ liệu</td></tr>
+                                    ) : (
+                                        paginated.map((row) => {
+                                            const badge = getBadge(row.status);
+                                            return (
+                                                <tr key={row.id}>
+                                                    <td>{row.rawId}</td>
+                                                    <td>{row.name}</td>
+                                                    <td>{row.type}</td>
+                                                    <td>{row.province}</td>
+                                                    <td>{row.price ? formatCurrency(row.price) : 'Theo lịch trình'}</td>
+                                                    <td>⭐ {row.rating || 0}/5</td>
+                                                    <td>
+                                                        <span className={`badge ${badge.cls}`}>{badge.label}</span>
+                                                    </td>
+                                                    <td>
+                                                        <button className="btn btn-sm btn-info mr-1" onClick={() => openEdit(row)}>
+                                                            <i className="fas fa-edit"></i>
+                                                        </button>
+                                                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(row)}>
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                </div>
+
+                {/* PAGINATION */}
+                {!loading && (
+                    <div className="d-flex justify-content-between align-items-center mt-3 mb-3">
+                        <div>Tổng: <strong>{filtered.length}</strong> địa điểm</div>
+                        <div className="d-flex align-items-center" style={{ gap: '8px' }}>
+                            <button
+                                className="btn btn-secondary btn-sm"
+                                disabled={currentPage === 1}
+                                onClick={() => changePage(currentPage - 1)}
+                            >← Previous</button>
+
+                            <span>Trang <strong>{currentPage}</strong> / {totalPages}</span>
+
+                            <button
+                                className="btn btn-secondary btn-sm"
+                                disabled={currentPage === totalPages}
+                                onClick={() => changePage(currentPage + 1)}
+                            >Next →</button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* MODAL THÊM / SỬA */}
+            {showModal && (
+                <>
+                    <div className="modal fade show" style={{ display: 'block' }}>
+                        <div className="modal-dialog modal-lg">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5>{editing ? 'Sửa địa điểm' : 'Thêm địa điểm'}</h5>
+                                    <button className="close" onClick={closeModal}><span>&times;</span></button>
+                                </div>
+                                <form onSubmit={handleSubmit}>
+                                    <div className="modal-body">
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Tên địa điểm <span className="text-danger">*</span></label>
+                                                    <input
+                                                        className="form-control"
+                                                        placeholder="Nhập tên..."
+                                                        value={form.name}
+                                                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Loại <span className="text-danger">*</span></label>
+                                                    <select
+                                                        className="form-control"
+                                                        value={form.type}
+                                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                                        required
+                                                    >
+                                                        {ALL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Tỉnh thành <span className="text-danger">*</span></label>
+                                                    <input
+                                                        className="form-control"
+                                                        placeholder="VD: Đà Nẵng"
+                                                        value={form.province}
+                                                        onChange={(e) => setForm({ ...form, province: e.target.value })}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Vùng miền</label>
+                                                    <input
+                                                        className="form-control"
+                                                        placeholder="VD: Miền Trung"
+                                                        value={form.region}
+                                                        onChange={(e) => setForm({ ...form, region: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Giá (VNĐ / đêm)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        placeholder="Để trống nếu theo lịch trình"
+                                                        value={form.price}
+                                                        onChange={(e) => setForm({ ...form, price: e.target.value })}
+                                                        min="0"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Rating (0–5)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        placeholder="VD: 4.5"
+                                                        value={form.rating}
+                                                        onChange={(e) => setForm({ ...form, rating: e.target.value })}
+                                                        min="0" max="5" step="0.1"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Trạng thái</label>
+                                                    <select
+                                                        className="form-control"
+                                                        value={form.status}
+                                                        onChange={(e) => setForm({ ...form, status: e.target.value })}
+                                                    >
+                                                        <option value="Active">Hoạt động</option>
+                                                        <option value="Con phong">Còn chỗ</option>
+                                                        <option value="Sap het phong">Sắp hết</option>
+                                                        <option value="Het phong">Hết chỗ</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Danh mục</label>
+                                                    <input
+                                                        className="form-control"
+                                                        placeholder="VD: Biển & phố cổ"
+                                                        value={form.category}
+                                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-12">
+                                                <div className="form-group">
+                                                    <label>Mô tả</label>
+                                                    <textarea
+                                                        className="form-control"
+                                                        rows="3"
+                                                        placeholder="Nhập mô tả ngắn..."
+                                                        value={form.description}
+                                                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={closeModal}>Huỷ</button>
+                                        <button type="submit" className="btn btn-primary">Lưu</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
+        </>
+    );
+};
+
+export default Locations;

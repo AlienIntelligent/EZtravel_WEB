@@ -8,6 +8,7 @@ public class ReviewDto
     public string? UserAvatar { get; set; }
     public int? ServiceId { get; set; }
     public int? PlaceId { get; set; }
+    public string? LoaiDoiTuong { get; set; }
     public int Rating { get; set; }
     public string? Comment { get; set; }
     public DateTime ReviewDate { get; set; }
@@ -17,6 +18,7 @@ public class CreateReviewRequest
 {
     public int? ServiceId { get; set; }
     public int? PlaceId { get; set; }
+    public string? LoaiDoiTuong { get; set; }
     public int Rating { get; set; }
     public string? Comment { get; set; }
 }
