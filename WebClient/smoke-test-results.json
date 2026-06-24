@@ -1,0 +1,784 @@
+[
+  {
+    "route": "/",
+    "role": "GUEST",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": false
+  },
+  {
+    "route": "/explore",
+    "role": "GUEST",
+    "url": "http://localhost:3000/explore",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": false
+  },
+  {
+    "route": "/community",
+    "role": "GUEST",
+    "url": "http://localhost:3000/community",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": false
+  },
+  {
+    "route": "/auth/login",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": false
+  },
+  {
+    "route": "/trips",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/trips/create",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/profile",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/notifications",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/ai/planner",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/provider/registration",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/provider/pending",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/provider/dashboard",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/admin",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/admin/users",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/admin/moderation",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/admin/categories",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/admin/provider-packages",
+    "role": "GUEST",
+    "url": "http://localhost:3000/auth/login",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "redirected": true
+  },
+  {
+    "route": "/",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/explore",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/explore",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/community",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/community",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/auth/login",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/trips",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/trips",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/trips/create",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/trips/create",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/profile",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/profile",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/notifications",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/notifications",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/ai/planner",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/upgrade",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/provider/registration",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/provider/registration",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/provider/pending",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/provider/registration",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/provider/dashboard",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/provider/registration",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/users",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/moderation",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/categories",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/provider-packages",
+    "role": "TRAVELER",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/explore",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/explore",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/community",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/community",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/auth/login",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/provider/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/trips",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/trips",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/trips/create",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/trips/create",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/profile",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/profile",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/notifications",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/notifications",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/ai/planner",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/ai/planner",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/provider/registration",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/provider/registration",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/provider/pending",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/provider/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/provider/dashboard",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/provider/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/admin",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/users",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/moderation",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/categories",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/provider-packages",
+    "role": "PROVIDER_APPROVED",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/explore",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/explore",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/community",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/community",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/auth/login",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/trips",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/trips",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/trips/create",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/trips/create",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/profile",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/profile",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/notifications",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/notifications",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/ai/planner",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/ai/planner",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/provider/registration",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/provider/registration",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/provider/pending",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/provider/dashboard",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/provider/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/admin",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/dashboard",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": true
+  },
+  {
+    "route": "/admin/users",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/users",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/admin/moderation",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/moderation",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/admin/categories",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/categories",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  },
+  {
+    "route": "/admin/provider-packages",
+    "role": "ADMIN",
+    "url": "http://localhost:3000/admin/provider-packages",
+    "status": 200,
+    "isWhiteScreen": false,
+    "consoleErrors": [],
+    "redirected": false
+  }
+]

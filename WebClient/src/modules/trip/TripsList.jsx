@@ -1,9 +1,13 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetTripsQuery, useDeleteTripMutation } from "@/store/apis/plannerApi";
+import {
+  useGetTripsQuery,
+  useDeleteTripMutation,
+} from "@/store/apis/plannerApi";
 import { Search, LayoutGrid, List, AlertCircle, Plus } from "lucide-react";
 import "./trip.css";
 import TripCard from "./components/TripCard";
+import Pagination from "@/shared/components/Pagination";
 
 const STATUS_FILTERS = [
   { label: "Tất cả", value: "ALL" },
@@ -14,7 +18,8 @@ const STATUS_FILTERS = [
   { label: "❌ Đã hủy", value: "CANCELLED" },
 ];
 
-const HERO_BG = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80";
+const HERO_BG =
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80";
 
 export default function TripsList() {
   const navigate = useNavigate();
@@ -25,17 +30,19 @@ export default function TripsList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("NEWEST");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
   const filteredTrips = useMemo(() => {
     if (!trips) return [];
     let result = [...trips];
     if (searchQuery) {
-      result = result.filter(t =>
-        t.tenLichTrinh?.toLowerCase().includes(searchQuery.toLowerCase())
+      result = result.filter((t) =>
+        t.tenLichTrinh?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
     if (statusFilter !== "ALL") {
-      result = result.filter(t => t.trangThai === statusFilter);
+      result = result.filter((t) => t.trangThai === statusFilter);
     }
     result.sort((a, b) => {
       if (sortBy === "NEWEST")
@@ -51,6 +58,18 @@ export default function TripsList() {
     });
     return result;
   }, [trips, searchQuery, statusFilter, sortBy]);
+
+  const paginatedTrips = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredTrips.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredTrips, currentPage]);
+
+  const totalPages = Math.ceil(filteredTrips.length / ITEMS_PER_PAGE);
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, sortBy]);
 
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa chuyến đi này không?")) {
@@ -71,14 +90,9 @@ export default function TripsList() {
         style={{ backgroundImage: `url("${HERO_BG}")` }}
       >
         <div className="trips-hero__overlay" />
-        <div className="trips-hero__content">
-          <p className="trips-hero__breadcrumb">
-            <a href="/">Trang chủ</a>
-            <span> / </span>
-            <span>Chuyến đi của tôi</span>
-          </p>
-          <h1 className="trips-hero__title">Chuyến đi của tôi</h1>
-          <p className="trips-hero__subtitle">
+        <div className="trips-hero__content text-white">
+          <h1 className="trips-hero__title text-white">Chuyến đi của tôi</h1>
+          <p className="trips-hero__subtitle text-slate-100">
             Quản lý và lên kế hoạch cho các chuyến du lịch sắp tới của bạn
           </p>
           <button
@@ -94,7 +108,6 @@ export default function TripsList() {
       {/* ─── CONTENT SECTION ─── */}
       <section className="trips-section">
         <div className="trips-container">
-
           {/* Toolbar */}
           <div className="trips-toolbar">
             {/* Status Filter Chips */}
@@ -163,11 +176,7 @@ export default function TripsList() {
           {/* Loading */}
           {isLoading && (
             <div
-              className={
-                viewMode === "grid"
-                  ? "trips-grid"
-                  : "trips-list-view"
-              }
+              className={viewMode === "grid" ? "trips-grid" : "trips-list-view"}
             >
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="trips-skeleton" />
@@ -209,21 +218,26 @@ export default function TripsList() {
 
           {/* Trips Grid / List */}
           {!isLoading && !error && filteredTrips.length > 0 && (
-            <div
-              className={
-                viewMode === "grid"
-                  ? "trips-grid"
-                  : "trips-list-view"
-              }
-            >
-              {filteredTrips.map((trip) => (
-                <TripCard
-                  key={trip.id}
-                  trip={trip}
-                  viewMode={viewMode}
-                  onDelete={handleDelete}
+            <div className="flex flex-col gap-8">
+              <div
+                className={viewMode === "grid" ? "trips-grid" : "trips-list-view"}
+              >
+                {paginatedTrips.map((trip) => (
+                  <TripCard
+                    key={trip.id}
+                    trip={trip}
+                    viewMode={viewMode}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
                 />
-              ))}
+              )}
             </div>
           )}
         </div>

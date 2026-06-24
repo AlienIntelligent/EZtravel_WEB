@@ -1,0 +1,1 @@
+import{n as e,t}from"./jsx-runtime-m7G7yzlP.js";e();var n=t();function r(){return(0,n.jsxs)(`div`,{className:`p-6`,children:[(0,n.jsx)(`h1`,{className:`text-2xl font-bold text-foreground mb-2`,children:`Tài chính`}),(0,n.jsx)(`p`,{className:`text-muted-foreground`,children:`Tính năng đang trong quá trình phát triển.`})]})}export{r as default};

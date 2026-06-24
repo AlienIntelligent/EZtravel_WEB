@@ -1,97 +1,99 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Star, MapPin } from "lucide-react";
+import { Star, MapPin, Heart } from "lucide-react";
 import { Place, Service } from "../../../shared/types";
 import { PartnerBadge } from "@/components/ui/PartnerBadge";
 import { Button } from "@/components/ui/button";
 
 interface ExploreCardProps {
-  item: Place | Service;
-  type: "PLACE" | "SERVICE";
-  badgeType?: string;
+ item: Place | Service;
+ type: "PLACE" | "SERVICE";
+ badgeType?: string;
 }
 
 export default function ExploreCard({ item, type, badgeType }: ExploreCardProps) {
-  const isService = type === "SERVICE";
-  const price = isService && "price" in item ? (item as Service).price : null;
-  const address = "address" in item ? item.address : "Vietnam";
-  const displayAddress = address.split(",").pop()?.trim() || address;
-  const detailsPath = isService
-    ? `/explore/services/${item.id}`
-    : `/explore/destinations/${item.id}`;
-  const fallbackImage = `/images/${
-    isService ? "hotel" : "destination"
-  }-${((Number(item.id) || 1) - 1) % 6 + 1}.jpg`;
+ const isService = type === "SERVICE";
+ const price = isService && "price" in item ? (item as Service).price : null;
+ const address = "address" in item ? item.address : "Vietnam";
+ const displayAddress = address.split(",").pop()?.trim() || address;
+ const detailsPath = isService
+ ? `/explore/services/${item.id}`
+ : `/explore/destinations/${item.id}`;
+ const fallbackImage = `/images/${
+ isService ? "hotel" : "destination"
+ }-${((Number(item.id) || 1) - 1) % 6 + 1}.jpg`;
 
-  return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
-      <Link to={detailsPath} className="relative block h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-        <img
-          src={item.images?.[0] || fallbackImage}
-          alt={item.name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          loading="lazy"
-          onError={(event) => {
-            if (event.currentTarget.src.endsWith(fallbackImage)) return;
-            event.currentTarget.src = fallbackImage;
-          }}
-        />
-        {badgeType && badgeType !== "NONE" && (
-          <div className="absolute right-3 top-3 z-10">
-            <PartnerBadge type={badgeType} />
-          </div>
-        )}
-      </Link>
+ return (
+ <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ">
+ <Link to={detailsPath} className="relative block aspect-[4/3] w-full overflow-hidden bg-muted ">
+ <img
+ src={item.images?.[0] || fallbackImage}
+ alt={item.name}
+ className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+ loading="lazy"
+ onError={(event) => {
+ if (event.currentTarget.src.endsWith(fallbackImage)) return;
+ event.currentTarget.src = fallbackImage;
+ }}
+ />
+ {badgeType && badgeType !== "NONE" && (
+ <div className="absolute left-3 top-3 z-10">
+ <PartnerBadge type={badgeType} />
+ </div>
+ )}
+ <button className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/90 text-muted-foreground shadow-sm transition-colors hover:bg-background hover:text-cta /90 dark:hover:bg-slate-900">
+ <Heart className="h-4 w-4" />
+ </button>
+ </Link>
 
-      <div className="flex flex-1 flex-col p-4">
-        <div className="mb-1.5 flex items-start justify-between gap-2">
-          <Link
-            to={detailsPath}
-            className="line-clamp-1 text-base font-bold text-slate-950 hover:text-primary dark:text-slate-50"
-          >
-            {item.name}
-          </Link>
-          {isService && "type" in item && (
-            <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {(item as Service).type}
-            </span>
-          )}
-        </div>
+ <div className="flex flex-1 flex-col p-4">
+ <div className="mb-1 flex items-start justify-between gap-2">
+ <Link
+ to={detailsPath}
+ className="line-clamp-1 font-sans text-lg font-bold text-foreground hover:text-primary "
+ >
+ {item.name}
+ </Link>
+ <div className="flex shrink-0 items-center gap-1 text-sm font-semibold text-muted-foreground ">
+ {item.averageRating?.toFixed(1) || "0.0"}
+ <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
+ </div>
+ </div>
 
-        <div className="mb-3 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-0.5">
-            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
-            <span className="font-semibold text-slate-700 dark:text-slate-200">
-              {item.averageRating?.toFixed(1) || "0.0"}
-            </span>
-            <span>({item.totalReviews || 0})</span>
-          </div>
-          <div className="flex items-center gap-0.5">
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="line-clamp-1">{displayAddress}</span>
-          </div>
-        </div>
+ <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground ">
+ <div className="flex items-center gap-1">
+ <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+ <span className="line-clamp-1">{displayAddress}</span>
+ </div>
+ {isService && "type" in item && (
+ <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
+ {(item as Service).type}
+ </span>
+ )}
+ </div>
 
-        <p className="mb-4 line-clamp-3 flex-1 text-xs text-slate-500 dark:text-slate-400">
-          {item.description}
-        </p>
+ <p className="mb-4 line-clamp-2 flex-1 text-xs text-muted-foreground ">
+ {item.description}
+ </p>
 
-        <div className="mt-auto flex items-center justify-between gap-4 border-t border-slate-100 pt-2 dark:border-slate-800">
-          <div>
-            {price !== null && (
-              <>
-                <span className="block text-[10px] font-medium uppercase text-slate-400">Giá từ</span>
-                <span className="text-sm font-semibold text-teal-600 dark:text-teal-400">
-                  {price.toLocaleString("vi-VN")} đ
-                </span>
-              </>
-            )}
-          </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link to={detailsPath}>Xem chi tiết</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+ {price !== null && (
+ <div className="mb-3 flex items-baseline gap-1">
+ <span className="text-[10px] font-medium uppercase text-muted-foreground">Giá từ</span>
+ <span className="text-sm font-semibold text-primary">
+ {price.toLocaleString("vi-VN")} đ
+ </span>
+ </div>
+ )}
+
+ <div className="mt-auto flex flex-col gap-2 pt-3 border-t border-border ">
+ <Button size="sm" className="w-full bg-cta text-cta-foreground hover:bg-cta/90 border-0 font-medium">
+ + Thêm vào lịch trình
+ </Button>
+ <Button variant="outline" size="sm" className="w-full border-secondary text-secondary hover:bg-secondary/5 hover:text-secondary font-medium" asChild>
+ <Link to={detailsPath}>Xem chi tiết</Link>
+ </Button>
+ </div>
+ </div>
+ </div>
+ );
 }

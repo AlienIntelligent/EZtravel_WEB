@@ -19,13 +19,13 @@ import "@fontsource/playfair-display/700.css";
 import "./index.css";
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <Provider store={store}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </Provider>
-    </ErrorBoundary>
-  </StrictMode>,
+ <StrictMode>
+ <ErrorBoundary>
+ <Provider store={store}>
+ <AuthProvider>
+ <App />
+ </AuthProvider>
+ </Provider>
+ </ErrorBoundary>
+ </StrictMode>,
 )

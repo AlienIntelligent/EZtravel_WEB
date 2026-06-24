@@ -12,6 +12,9 @@ export const PUBLIC_ROUTES = {
   BLOGS: '/community/blogs',
   BLOG_DETAILS: '/community/blogs/:id',
   DESIGN_PREVIEW: '/preview/design-system',
+  ABOUT: '/about',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
 };
 
 export const AUTH_ROUTES = {
@@ -46,6 +49,10 @@ export const PROVIDER_APPROVED_ROUTES = {
   CURRENT_PACKAGE: '/provider/current-package',
   PACKAGE_HISTORY: '/provider/package-history',
   PAYMENT_HISTORY: '/provider/payment-history',
+  BOOKINGS: '/provider/bookings',
+  ANALYTICS: '/provider/analytics',
+  FINANCE: '/provider/finance',
+  SETTINGS: '/provider/settings',
 };
 
 export const ADMIN_ROUTES = {
@@ -54,4 +61,8 @@ export const ADMIN_ROUTES = {
   MODERATION: '/admin/moderation',
   CATEGORIES: '/admin/categories',
   PROVIDER_PACKAGES: '/admin/provider-packages',
+  LOCATIONS: '/admin/locations',
+  COMMUNITY: '/admin/community',
+  REPORTS: '/admin/reports',
+  SYSTEM: '/admin/system',
 };

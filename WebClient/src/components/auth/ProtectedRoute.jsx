@@ -6,12 +6,12 @@ import { useAppSelector } from "../../store/hooks";
 
 
 export function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const location = useLocation();
+ const { isAuthenticated } = useAppSelector((state) => state.auth);
+ const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+ if (!isAuthenticated) {
+ return <Navigate to="/login" state={{ from: location }} replace />;
+ }
 
-  return <>{children}</>;
+ return <>{children}</>;
 }

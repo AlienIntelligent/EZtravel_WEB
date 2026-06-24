@@ -24,7 +24,8 @@ public class AITripGenerationService : AiServiceBase, IAITripGenerationService
         var places = await LoadPlacesAsync(destination);
         var placeIds = places.Select(p => p.Id).ToList();
         var services = await LoadServicesAsync(placeIds);
-        var days = BuildDays(startDate, dayCount, places, services);
+        
+        var days = await BuildDaysWithAIAsync(startDate, dayCount, request, places, services);
         var estimatedBudget = EstimateBudget(request.BudgetMode, dayCount, services);
         var summary = BuildSummary(request, destination, dayCount, places, services, estimatedBudget);
 
@@ -46,12 +47,12 @@ public class AITripGenerationService : AiServiceBase, IAITripGenerationService
             days,
             places = places.Select(MapPlace).ToList(),
             services = services.Select(MapService).ToList(),
-            source = "eztravel-db-planner",
+            source = "gemini-ai-planner",
             historyId = (int?)null,
             maLichSuAi = (int?)null
         };
 
-        var historyId = await SaveHistoryAsync(userId, "TRIP_GENERATION", request, summary);
+        var historyId = await SaveHistoryAsync(userId, "SINH_LICH_TRINH", request, summary);
 
         return new
         {
@@ -64,6 +65,109 @@ public class AITripGenerationService : AiServiceBase, IAITripGenerationService
             historyId,
             maLichSuAi = historyId
         };
+    }
+
+    private async Task<List<object>> BuildDaysWithAIAsync(
+        DateOnly startDate, 
+        int dayCount, 
+        GenerateTripRequest request, 
+        IReadOnlyList<AiPlace> places, 
+        IReadOnlyList<AiServiceItem> services)
+    {
+        var placesJson = System.Text.Json.JsonSerializer.Serialize(places.Select(p => new { p.Id, p.Name, p.Description, p.Rating }));
+        var servicesJson = System.Text.Json.JsonSerializer.Serialize(services.Select(s => new { s.Id, s.PlaceId, s.Name, s.Type, s.Price, s.Rating }));
+        
+        var preferences = request.Preferences.Count > 0 ? string.Join(", ", request.Preferences) : "Trải nghiệm cân bằng";
+
+        var systemPrompt = @"Bạn là một AI chuyên thiết kế lịch trình du lịch chuyên nghiệp của ezTravel.
+Nhiệm vụ của bạn là nhận dữ liệu các Địa điểm (Places) và Dịch vụ (Services) có sẵn từ Database, sau đó sắp xếp chúng thành một lịch trình hợp lý theo từng ngày.
+YÊU CẦU BẮT BUỘC:
+- CHỈ sử dụng các ID (PlaceId, ServiceId) có trong danh sách được cung cấp. Tuyệt đối KHÔNG tự bịa ra ID mới.
+- Đầu ra phải là định dạng JSON hợp lệ tuân thủ chính xác Schema sau:
+{
+  ""days"": [
+    {
+      ""dayNumber"": 1,
+      ""summary"": ""Tóm tắt ngày 1"",
+      ""items"": [
+        {
+          ""placeId"": 1,
+          ""time"": ""09:00"",
+          ""note"": ""Ghi chú cho địa điểm này"",
+          ""serviceIds"": [10, 11]
+        }
+      ]
+    }
+  ]
+}";
+
+        var userPrompt = $"Tạo lịch trình {dayCount} ngày.\nSở thích: {preferences}\n\nPlaces:\n{placesJson}\n\nServices:\n{servicesJson}";
+
+        try 
+        {
+            var jsonResponse = await CallGeminiJsonAsync(systemPrompt, userPrompt);
+            using var doc = System.Text.Json.JsonDocument.Parse(jsonResponse);
+            var daysArray = doc.RootElement.GetProperty("days");
+            
+            var resultDays = new List<object>();
+            for (int i = 0; i < daysArray.GetArrayLength(); i++)
+            {
+                var dayNode = daysArray[i];
+                int dayNumber = dayNode.GetProperty("dayNumber").GetInt32();
+                string daySummary = dayNode.GetProperty("summary").GetString() ?? "";
+                
+                var itemsArray = dayNode.GetProperty("items");
+                var resultItems = new List<object>();
+                
+                for (int j = 0; j < itemsArray.GetArrayLength(); j++)
+                {
+                    var itemNode = itemsArray[j];
+                    int placeId = itemNode.GetProperty("placeId").GetInt32();
+                    string time = itemNode.GetProperty("time").GetString() ?? "09:00";
+                    string note = itemNode.GetProperty("note").GetString() ?? "";
+                    
+                    var place = places.FirstOrDefault(p => p.Id == placeId);
+                    if (place == null) continue;
+
+                    var serviceIdsList = new List<int>();
+                    if (itemNode.TryGetProperty("serviceIds", out var svcArray))
+                    {
+                        for (int k = 0; k < svcArray.GetArrayLength(); k++)
+                            serviceIdsList.Add(svcArray[k].GetInt32());
+                    }
+                    
+                    var relatedServices = services.Where(s => serviceIdsList.Contains(s.Id)).Select(MapService).ToList();
+
+                    resultItems.Add(new
+                    {
+                        id = $"day-{dayNumber}-place-{placeId}",
+                        type = "place",
+                        order = j + 1,
+                        time,
+                        place = MapPlace(place),
+                        services = relatedServices,
+                        note
+                    });
+                }
+                
+                resultDays.Add(new
+                {
+                    id = $"day-{dayNumber}",
+                    dayNumber = dayNumber,
+                    date = startDate.AddDays(dayNumber - 1).ToString("yyyy-MM-dd"),
+                    title = $"Ngày {dayNumber}",
+                    summary = daySummary,
+                    items = resultItems
+                });
+            }
+            return resultDays;
+        }
+        catch (Exception ex)
+        {
+            // Fallback về logic cũ nếu có lỗi gọi AI (để tránh lỗi cho user)
+            Console.WriteLine("AI Trip Generation Failed, falling back. " + ex.Message);
+            return BuildDays(startDate, dayCount, places, services);
+        }
     }
 
     private async Task<List<AiPlace>> LoadPlacesAsync(string destination)

@@ -1,5 +1,5 @@
 import ProviderServiceFormPage from "./ProviderServiceFormPage";
 
 export default function ProviderServiceCreate() {
-  return <ProviderServiceFormPage mode="create" />;
+ return <ProviderServiceFormPage mode="create" />;
 }

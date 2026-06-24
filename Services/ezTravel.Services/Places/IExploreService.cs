@@ -12,6 +12,7 @@ public interface IExploreService
     Task<object> SearchExploreAsync(PlaceSearchRequest request);
     Task<object> GetDestinationServicesAsync(int id);
     Task<object> GetTrendingDestinationsAsync();
+    Task<object> GetNearbyResourcesAsync(int placeId);
 }
 
 public class ExploreService : IExploreService
@@ -120,6 +121,54 @@ public class ExploreService : IExploreService
                 badgeType = "FEATURED"
             };
         }).ToList();
+    }
+
+    public async Task<object> GetNearbyResourcesAsync(int placeId)
+    {
+        var targetPlace = await _uow.DiaDiems.GetQueryable()
+            .FirstOrDefaultAsync(p => p.MaDiaDiem == placeId);
+
+        if (targetPlace == null) return new { error = "Không tìm thấy địa điểm gốc." };
+
+        // Lấy 5 điểm tham quan cùng tỉnh thành
+        var places = await _uow.DiaDiems.GetQueryable()
+            .Include(place => place.MaTinhThanhNavigation)
+            .Include(place => place.AnhDiaDiem)
+            .Include(place => place.MaTag)
+            .Where(place => place.TrangThai != "DELETED" && place.MaDiaDiem != placeId && place.MaTinhThanh == targetPlace.MaTinhThanh)
+            .OrderByDescending(place => place.DanhGiaTrungBinh)
+            .Take(5)
+            .ToListAsync();
+
+        // Lấy dịch vụ (Khách sạn, Nhà hàng, Hoạt động, Phương tiện)
+        var serviceQuery = _uow.DichVus.GetQueryable()
+            .Include(service => service.MaDiaDiemNavigation)
+                .ThenInclude(place => place.MaTinhThanhNavigation)
+            .Include(service => service.MaNhaCungCapNavigation)
+                .ThenInclude(provider => provider.MaGoiNccHienTaiNavigation)
+            .Include(service => service.AnhDichVu)
+            .Where(service => service.TrangThai == "ACTIVE" && service.MaDiaDiemNavigation.MaTinhThanh == targetPlace.MaTinhThanh);
+
+        var hotels = await serviceQuery.Where(s => s.LoaiDichVu == "KHACH_SAN")
+            .OrderByDescending(s => s.DanhGiaTrungBinh).Take(5).ToListAsync();
+        
+        var restaurants = await serviceQuery.Where(s => s.LoaiDichVu == "NHA_HANG")
+            .OrderByDescending(s => s.DanhGiaTrungBinh).Take(5).ToListAsync();
+            
+        var activities = await serviceQuery.Where(s => s.LoaiDichVu == "HOAT_DONG")
+            .OrderByDescending(s => s.DanhGiaTrungBinh).Take(5).ToListAsync();
+            
+        var transports = await serviceQuery.Where(s => s.LoaiDichVu == "PHUONG_TIEN")
+            .OrderByDescending(s => s.DanhGiaTrungBinh).Take(5).ToListAsync();
+
+        return new
+        {
+            places = places.Select(MapPlaceCard).ToList(),
+            hotels = hotels.Select(MapServiceCard).ToList(),
+            restaurants = restaurants.Select(MapServiceCard).ToList(),
+            activities = activities.Select(MapServiceCard).ToList(),
+            transports = transports.Select(MapServiceCard).ToList()
+        };
     }
 
     private async Task<object> SearchPlacesAsync(PlaceSearchRequest request)
@@ -383,7 +432,7 @@ public class ExploreService : IExploreService
         => page < 1 ? 1 : page;
 
     private static int NormalizePageSize(int pageSize)
-        => pageSize is < 1 or > 60 ? 12 : pageSize;
+        => pageSize is < 1 or > 10000 ? 12 : pageSize;
 
     private static string? NormalizeProvince(string? province)
         => TrimToNull(province) switch

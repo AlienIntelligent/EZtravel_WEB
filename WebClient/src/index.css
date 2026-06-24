@@ -1,34 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "./styles/tokens.css";
 @import "tailwindcss";
 @config "../tailwind.config.js";
  
 @layer base {
   :root {
-    --background: 210 33.3% 97.6%; /* #F8FAFC Slate 50 */
-    --foreground: 215.3 25% 26.7%; /* #334155 Slate 700 Body */
-    --heading: 222.2 47.4% 11.2%; /* #0F172A Slate 900 Heading */
+    /* Background: #FFF6F6 */
+    --background: 0 0% 100%; 
+    --foreground: 222.2 84% 4.9%; 
+    --heading: 222.2 84% 4.9%; 
 
-    --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 215.3 25% 26.7%;
+    --card: 0 0% 100%; 
+    --card-foreground: 222.2 84% 4.9%;
  
     --popover: 0 0% 100%;
-    --popover-foreground: 215.3 25% 26.7%;
+    --popover-foreground: 222.2 84% 4.9%;
  
-    /* Primary action: ezTravel coral #FF5A5F */
-    --primary: 358.4 100% 67.6%;
+    /* Primary: Dark Teal #2C687B */
+    --primary: 194 47.3% 32.7%;
     --primary-foreground: 0 0% 100%;
  
-    /* Secondary: Teal #14B8A6 */
-    --secondary: 173.4 80.4% 40%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary: Light Teal #8CC7C4 */
+    --secondary: 177 36.6% 66.5%;
+    --secondary-foreground: 194 47.3% 15%;
+
+    /* CTA / Accent / Destructive: Red #DB1A1A */
+    --cta: 0 78.8% 48%;
+    --cta-foreground: 0 0% 100%;
+    
+    --accent: 0 78.8% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 78.8% 48%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Premium: Gold #D4AF37 */
     --premium: 46.5 65.4% 52.7%;
     --premium-foreground: 0 0% 100%;
-
-    /* Accent: Amber #F59E0B */
-    --accent: 37.7 92.1% 50.2%;
-    --accent-foreground: 0 0% 100%;
  
     /* Success #22C55E */
     --success: 142.1 70.6% 45.3%;
@@ -38,48 +46,49 @@
     --warning: 24.6 95% 53.1%;
     --warning-foreground: 0 0% 100%;
  
-    /* Danger #EF4444 */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
  
-    --muted: 210 40% 96.1%; /* Slate 100 */
-    --muted-foreground: 215 16.3% 46.9%; /* Slate 500 */
- 
-    --border: 214.3 31.8% 91.4%; /* Slate 200 */
+    --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 358.4 100% 67.6%;
+    --ring: 194 47.3% 32.7%;
  
     --radius: 0.5rem; /* 8px default */
   }
  
   .dark {
-    /* Background Slate 950 */
-    --background: 222.2 47.4% 11.2%; 
-    --foreground: 210 33.3% 97.6%; /* Slate 100 Body */
-    --heading: 210 33.3% 97.6%; /* Slate 100 Heading */
+    /* Background Very Dark Teal */
+    --background: 194 47.3% 10%; 
+    --foreground: 0 100% 98.2%; /* #FFF6F6 for text */
+    --heading: 0 0% 100%;
  
-    /* Card Slate 900 */
-    --card: 215.3 32.5% 17.5%; 
-    --card-foreground: 210 33.3% 97.6%;
+    --card: 194 47.3% 15%; 
+    --card-foreground: 0 100% 98.2%;
  
-    /* Popover/Elevated Slate 900 */
-    --popover: 215.3 25% 26.7%; 
-    --popover-foreground: 210 33.3% 97.6%;
+    --popover: 194 47.3% 15%; 
+    --popover-foreground: 0 100% 98.2%;
  
-    --primary: 358.4 100% 67.6%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Light Teal in Dark Mode #8CC7C4 */
+    --primary: 177 36.6% 66.5%;
+    --primary-foreground: 194 47.3% 10%;
  
-    /* Secondary: Teal */
-    --secondary: 173.4 80.4% 40%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary: Dark Teal */
+    --secondary: 194 47.3% 32.7%;
+    --secondary-foreground: 0 100% 98.2%;
+
+    /* CTA / Accent: Red #DB1A1A */
+    --cta: 0 78.8% 48%;
+    --cta-foreground: 0 0% 100%;
+
+    --accent: 0 78.8% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 78.8% 48%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Premium: Gold */
     --premium: 46.5 65.4% 52.7%;
     --premium-foreground: 0 0% 100%;
-
-    /* Accent: Amber */
-    --accent: 37.7 92.1% 50.2%;
-    --accent-foreground: 0 0% 100%;
  
     /* Success */
     --success: 142.1 70.6% 45.3%;
@@ -89,17 +98,12 @@
     --warning: 24.6 95% 53.1%;
     --warning-foreground: 0 0% 100%;
  
-    /* Danger */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --muted: 194 47.3% 20%;
+    --muted-foreground: 177 20% 60%;
  
-    --muted: 215.3 25% 26.7%; /* Slate 700 */
-    --muted-foreground: 215 16.3% 46.9%; /* Slate 400 */
- 
-    /* Border Slate 800 */
-    --border: 215.3 19.3% 34.5%; 
-    --input: 215.3 19.3% 34.5%;
-    --ring: 358.4 100% 67.6%;
+    --border: 194 47.3% 25%; 
+    --input: 194 47.3% 25%;
+    --ring: 177 36.6% 66.5%;
   }
 }
  
@@ -141,10 +145,16 @@
   }
 }
 
+/* Base headings */
+h1, h2, h3 {
+  @apply font-sans;
+}
+h4, h5, h6 {
+  @apply font-sans font-semibold;
+}
+
 /* Custom Shell Header Layout overrides - avoids spacing.16 override */
 .app-header {
-  height: 64px;
-  background-color: var(--card);
   border-bottom: 1px solid var(--border);
   z-index: 40;
   position: sticky;

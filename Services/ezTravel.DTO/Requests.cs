@@ -39,6 +39,50 @@ namespace ezTravel.DTO.Requests
     public class UpdateProviderPackageStatusRequest { public bool IsActive { get; set; } }
     public class ResolveModerationRequest { public string Action { get; set; } = string.Empty; }
     public class CreateCategoryRequest { public string Name { get; set; } = string.Empty; public string Type { get; set; } = string.Empty; }
+    public class UpdateCategoryRequest { public string Name { get; set; } = string.Empty; public string Type { get; set; } = string.Empty; public string? ThumbnailUrl { get; set; } }
+    public class UpsertDestinationRequest { 
+        public string Name { get; set; } = string.Empty; 
+        public string Type { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty; 
+        public double Longitude { get; set; } 
+        public double Latitude { get; set; } 
+        public int ProvinceId { get; set; } 
+        public int RegionId { get; set; } 
+        public string? CoverImageUrl { get; set; } 
+        public string? Status { get; set; } 
+        public bool? IsVerifiable { get; set; } 
+    }
+    public class UpsertBlogAdminRequest {
+        public string Title { get; set; } = string.Empty;
+        public string? Slug { get; set; }
+        public string Summary { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public int? PlaceId { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public string? Status { get; set; }
+        public int AuthorId { get; set; }
+    }
+    public class UpdateBlogStatusAdminRequest {
+        public string Status { get; set; } = string.Empty;
+    }
+    public class UpsertProviderAdminRequest {
+        public string BusinessName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string ProviderType { get; set; } = string.Empty;
+        public string TaxCode { get; set; } = string.Empty;
+        public string LicenseNumber { get; set; } = string.Empty;
+        public string? Status { get; set; }
+    }
+    public class UpsertServiceAdminRequest {
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string Location { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+    }
     public class PostReviewRequest { public int Rating { get; set; } public string Comment { get; set; } = string.Empty; public string ImageUrl { get; set; } = string.Empty; }
     public class CreateBlogRequest
     {

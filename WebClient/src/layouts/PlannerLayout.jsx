@@ -9,15 +9,15 @@ import { Outlet } from "react-router-dom";
 import { ConsumerHeader } from "@/components/header/ConsumerHeader";
 
 export default function PlannerLayout() {
-  return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
-      {/* Shared consumer header — planner mode hides nav links & search */}
-      <ConsumerHeader plannerMode={true} />
+ return (
+ <div className="flex flex-col h-screen overflow-hidden bg-background">
+ {/* Shared consumer header — planner mode hides nav links & search */}
+ <ConsumerHeader plannerMode={true} />
 
-      {/* Planner workspace — full remaining height */}
-      <main className="flex-1 flex min-h-0 bg-background">
-        <Outlet />
-      </main>
-    </div>
-  );
+ {/* Planner workspace — full remaining height */}
+ <main className="flex-1 flex min-h-0 bg-background">
+ <Outlet />
+ </main>
+ </div>
+ );
 }
