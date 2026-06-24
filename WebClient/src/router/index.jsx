@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Suspense, lazy } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { FloatingAssistant } from '../components/system/FloatingAssistant';
 
 
 
@@ -41,6 +42,11 @@ const Explore = lazy(() => import('../modules/explore/ExploreWorkspace'));
 const DestinationDetails = lazy(() => import('../modules/explore/DestinationDetails'));
 const ServiceDetails = lazy(() => import('../modules/explore/ServiceDetails'));
 
+// Support
+const AboutPage = lazy(() => import('../modules/support/AboutPage'));
+const TermsPage = lazy(() => import('../modules/support/TermsPage'));
+const PrivacyPage = lazy(() => import('../modules/support/PrivacyPage'));
+
 // Community
 const CommunityFeed = lazy(() => import('../modules/community/CommunityWorkspace'));
 const BlogFeed = lazy(() => import('../modules/community/BlogFeed'));
@@ -75,13 +81,21 @@ const ProviderPackages = lazy(() => import('../modules/provider/Packages'));
 const ProviderCurrentPackage = lazy(() => import('../modules/provider/CurrentPackage'));
 const ProviderPackageHistory = lazy(() => import('../modules/provider/PackageHistory'));
 const ProviderPaymentHistory = lazy(() => import('../modules/provider/PaymentHistory'));
+const ProviderBookings = lazy(() => import('../modules/provider/Bookings'));
+const ProviderAnalytics = lazy(() => import('../modules/provider/Analytics'));
+const ProviderFinance = lazy(() => import('../modules/provider/Finance'));
+const ProviderSettings = lazy(() => import('../modules/provider/Settings'));
 
 // Admin
 const AdminDashboard = lazy(() => import('../modules/admin/Dashboard'));
 const AdminUsers = lazy(() => import('../modules/admin/UserManager'));
-const AdminModeration = lazy(() => import('../modules/admin/AdminModeration'));
+const AdminModeration = lazy(() => import('../modules/admin/ServiceModeration'));
 const AdminCategories = lazy(() => import('../modules/admin/AdminCategories'));
 const AdminProviderPackages = lazy(() => import('../modules/admin/PackageManager'));
+const AdminLocations = lazy(() => import('../modules/admin/PlacesManager'));
+const AdminCommunity = lazy(() => import('../modules/admin/BlogModeration'));
+const AdminReports = lazy(() => import('../modules/admin/Reports'));
+const AdminSystem = lazy(() => import('../modules/admin/SystemSettings'));
 
 const withSuspense = (Component) => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -91,7 +105,12 @@ const withSuspense = (Component) => (
 
 const DesignSystemPreview = lazy(() => import('../pages/preview/DesignSystemPreview'));
 
+const RootLayout = () => { return (<><Outlet /><FloatingAssistant /></>); };
+
 export const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
   {
     element: <PublicGuard />,
     children: [
@@ -106,6 +125,9 @@ export const router = createBrowserRouter([
           { path: PUBLIC_ROUTES.COMMUNITY, element: withSuspense(CommunityFeed) },
           { path: PUBLIC_ROUTES.BLOGS, element: withSuspense(BlogFeed) },
           { path: PUBLIC_ROUTES.BLOG_DETAILS, element: withSuspense(BlogDetails) },
+          { path: PUBLIC_ROUTES.ABOUT, element: withSuspense(AboutPage) },
+          { path: PUBLIC_ROUTES.TERMS, element: withSuspense(TermsPage) },
+          { path: PUBLIC_ROUTES.PRIVACY, element: withSuspense(PrivacyPage) },
         ],
       },
       {
@@ -191,6 +213,10 @@ export const router = createBrowserRouter([
               { path: PROVIDER_APPROVED_ROUTES.CURRENT_PACKAGE, element: withSuspense(ProviderCurrentPackage) },
               { path: PROVIDER_APPROVED_ROUTES.PACKAGE_HISTORY, element: withSuspense(ProviderPackageHistory) },
               { path: PROVIDER_APPROVED_ROUTES.PAYMENT_HISTORY, element: withSuspense(ProviderPaymentHistory) },
+              { path: PROVIDER_APPROVED_ROUTES.BOOKINGS, element: withSuspense(ProviderBookings) },
+              { path: PROVIDER_APPROVED_ROUTES.ANALYTICS, element: withSuspense(ProviderAnalytics) },
+              { path: PROVIDER_APPROVED_ROUTES.FINANCE, element: withSuspense(ProviderFinance) },
+              { path: PROVIDER_APPROVED_ROUTES.SETTINGS, element: withSuspense(ProviderSettings) },
             ],
           }
         ]
@@ -207,10 +233,16 @@ export const router = createBrowserRouter([
               { path: ADMIN_ROUTES.MODERATION, element: withSuspense(AdminModeration) },
               { path: ADMIN_ROUTES.CATEGORIES, element: withSuspense(AdminCategories) },
               { path: ADMIN_ROUTES.PROVIDER_PACKAGES, element: withSuspense(AdminProviderPackages) },
+              { path: ADMIN_ROUTES.LOCATIONS, element: withSuspense(AdminLocations) },
+              { path: ADMIN_ROUTES.COMMUNITY, element: withSuspense(AdminCommunity) },
+              { path: ADMIN_ROUTES.REPORTS, element: withSuspense(AdminReports) },
+              { path: ADMIN_ROUTES.SYSTEM, element: withSuspense(AdminSystem) },
             ],
           }
         ]
       }
+    ]
+  }
     ]
   }
 ]);

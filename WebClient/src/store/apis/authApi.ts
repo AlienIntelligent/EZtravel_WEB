@@ -25,6 +25,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
+      invalidatesTags: ["User"],
       transformResponse: (response: any) => {
         const data = response.data || response;
         return {

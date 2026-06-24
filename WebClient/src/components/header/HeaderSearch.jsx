@@ -9,7 +9,7 @@ export function HeaderSearch() {
       </div>
       <Input
         type="text"
-        aria-label="Tim diem den, lich trinh hoac dich vu"
+        aria-label="Tìm điểm đến, lịch trình hoặc dịch vụ"
         placeholder="Tìm điểm đến, lịch trình, dịch vụ..."
         className="w-full h-11 pl-12 pr-4 bg-muted/40 border-border/50 hover:bg-muted/60 hover:border-border focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary rounded-full shadow-sm transition-all text-[15px] truncate"
       />

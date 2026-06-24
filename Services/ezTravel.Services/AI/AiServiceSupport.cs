@@ -45,6 +45,76 @@ public abstract class AiServiceBase
         return history.MaLichSuAi;
     }
 
+    protected async Task<string> CallGeminiAsync(string systemInstruction, string promptText)
+    {
+        var payload = new
+        {
+            system_instruction = new { parts = new[] { new { text = systemInstruction } } },
+            contents = new[] { new { parts = new[] { new { text = promptText } } } }
+        };
+
+        var root = await CallGeminiRawAsync(payload);
+        return ExtractTextFromGeminiResponse(root);
+    }
+
+    protected async Task<string> CallGeminiJsonAsync(string systemInstruction, string promptText)
+    {
+        var payload = new
+        {
+            system_instruction = new { parts = new[] { new { text = systemInstruction } } },
+            contents = new[] { new { parts = new[] { new { text = promptText } } } },
+            generationConfig = new { responseMimeType = "application/json" }
+        };
+
+        var root = await CallGeminiRawAsync(payload);
+        return ExtractTextFromGeminiResponse(root);
+    }
+
+    protected async Task<JsonElement> CallGeminiRawAsync(object payload)
+    {
+        var apiKey = "AIzaSyDEWImld1OCkx2zVnPW2Teh1HMbaZvyk_s";
+        var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={apiKey}";
+
+        using var httpClient = new System.Net.Http.HttpClient();
+        var jsonOptions = new JsonSerializerOptions 
+        { 
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+        var jsonPayload = JsonSerializer.Serialize(payload, jsonOptions);
+        var content = new System.Net.Http.StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync(endpoint, content);
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Gemini API error: {response.StatusCode} - {responseBody}");
+        }
+
+        using var document = JsonDocument.Parse(responseBody);
+        return document.RootElement.Clone();
+    }
+
+    protected static string ExtractTextFromGeminiResponse(JsonElement root)
+    {
+        try 
+        {
+            var textResult = root
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString();
+
+            return textResult ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to parse Gemini response: {root}", ex);
+        }
+    }
+
     protected static int EstimateTokens(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

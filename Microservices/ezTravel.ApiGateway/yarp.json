@@ -1,216 +1,223 @@
 {
   "ReverseProxy": {
     "Routes": {
-      "auth": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/auth/{**catch-all}" }
-      },
-      "auth_exact": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/auth" }
-      },
-      "profile": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/profile/{**catch-all}" }
-      },
-      "profile_exact": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/profile" }
-      },
-      "explore": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/explore/{**catch-all}" }
-      },
-      "explore_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/explore" }
-      },
-      "destinations": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/destinations/{**catch-all}" }
-      },
-      "destinations_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/destinations" }
-      },
-      "categories": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/categories/{**catch-all}" }
-      },
-      "categories_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/categories" }
-      },
-      "public": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/public/{**catch-all}" }
-      },
-      "public_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/public" }
-      },
-      "community_trending_trips": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/public/home/trending-trips" }
-      },
-      "ai": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/ai/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "ai_exact": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/ai" },
-        "AuthorizationPolicy": "default"
-      },
-      "services": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/services/{**catch-all}" }
-      },
-      "services_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/services" }
-      },
-      "blogs": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/blogs/{**catch-all}" }
-      },
-      "blogs_exact": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/blogs" }
-      },
-      "community_paths": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/community/{**catch-all}" }
-      },
-      "community_paths_exact": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/community" }
-      },
-      "packages": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/packages/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "packages_exact": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/packages" },
-        "AuthorizationPolicy": "default"
-      },
-      "notifications": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/notifications/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "notifications_exact": {
-        "ClusterId": "auth",
-        "Match": { "Path": "/api/notifications" },
-        "AuthorizationPolicy": "default"
-      },
-      "traveler": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/traveler/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "traveler_exact": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/traveler" },
-        "AuthorizationPolicy": "default"
-      },
-      "trip_metadata": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/trips/metadata/{**catch-all}" }
-      },
-      "trip_recommendations": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/trips/recommendations" }
-      },
-      "community_trip_like": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/trips/{id}/like" },
-        "AuthorizationPolicy": "default"
-      },
-      "community_trip_comments": {
-        "ClusterId": "community",
-        "Order": -10,
-        "Match": { "Path": "/api/trips/{id}/comments" },
-        "AuthorizationPolicy": "default"
-      },
-      "trip": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/trips/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "trip_exact": {
-        "ClusterId": "trip",
-        "Match": { "Path": "/api/trips" },
-        "AuthorizationPolicy": "default"
-      },
-      "place": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/places/{**catch-all}" }
-      },
-      "place_exact": {
-        "ClusterId": "place",
-        "Match": { "Path": "/api/places" }
-      },
-      "booking": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/bookings/{**catch-all}" },
-        "AuthorizationPolicy": "default"
-      },
-      "booking_exact": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/bookings" },
-        "AuthorizationPolicy": "default"
-      },
-      "provider": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/providers/{**catch-all}" }
-      },
-      "provider_exact": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/providers" }
-      },
-      "provider_singular": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/provider/{**catch-all}" }
-      },
-      "provider_singular_exact": {
-        "ClusterId": "booking",
-        "Match": { "Path": "/api/provider" }
-      },
-      "community_reviews": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/reviews/{**catch-all}" }
-      },
-      "community_reviews_exact": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/reviews" }
-      },
-      "community_feeds": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/feeds/{**catch-all}" }
-      },
-      "community_feeds_exact": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/feeds" }
-      },
-      "community_user_follow": {
-        "ClusterId": "community",
-        "Match": { "Path": "/api/users/{id}/follow" },
-        "AuthorizationPolicy": "default"
-      },
-      "admin": {
-        "ClusterId": "admin",
-        "Match": { "Path": "/api/admin/{**catch-all}" },
-        "AuthorizationPolicy": "AdminOnly"
-      },
-      "admin_exact": {
-        "ClusterId": "admin",
-        "Match": { "Path": "/api/admin" },
-        "AuthorizationPolicy": "AdminOnly"
-      }
+        "auth": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/auth/{**catch-all}" }
+        },
+        "auth_exact": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/auth" }
+        },
+        "profile": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/profile/{**catch-all}" }
+        },
+        "profile_exact": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/profile" }
+        },
+        "explore": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/explore/{**catch-all}" }
+        },
+        "explore_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/explore" }
+        },
+        "destinations": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/destinations/{**catch-all}" }
+        },
+        "destinations_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/destinations" }
+        },
+        "categories": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/categories/{**catch-all}" }
+        },
+        "categories_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/categories" }
+        },
+        "public": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/public/{**catch-all}" }
+        },
+        "public_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/public" }
+        },
+        "community_trending_trips": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/public/home/trending-trips" }
+        },
+        "ai": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/ai/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "ai_exact": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/ai" },
+            "AuthorizationPolicy": "default"
+        },
+        "services": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/services/{**catch-all}" }
+        },
+        "services_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/services" }
+        },
+        "blogs": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/blogs/{**catch-all}" }
+        },
+        "blogs_exact": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/blogs" }
+        },
+        "community_paths": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/community/{**catch-all}" }
+        },
+        "community_paths_exact": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/community" }
+        },
+        "packages": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/packages/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "packages_exact": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/packages" },
+            "AuthorizationPolicy": "default"
+        },
+        "notifications": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/notifications/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "notifications_exact": {
+            "ClusterId": "auth",
+            "Match": { "Path": "/api/notifications" },
+            "AuthorizationPolicy": "default"
+        },
+        "traveler": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/traveler/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "traveler_exact": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/traveler" },
+            "AuthorizationPolicy": "default"
+        },
+        "trip_metadata": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/trips/metadata/{**catch-all}" }
+        },
+        "trip_recommendations": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/trips/recommendations" }
+        },
+        "community_trip_like": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/trips/{id}/like" },
+            "AuthorizationPolicy": "default"
+        },
+        "community_trip_comments": {
+            "ClusterId": "community",
+            "Order": -10,
+            "Match": { "Path": "/api/trips/{id}/comments" },
+            "AuthorizationPolicy": "default"
+        },
+        "trip": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/trips/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "trip_exact": {
+            "ClusterId": "trip",
+            "Match": { "Path": "/api/trips" },
+            "AuthorizationPolicy": "default"
+        },
+        "place": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/places/{**catch-all}" }
+        },
+        "place_exact": {
+            "ClusterId": "place",
+            "Match": { "Path": "/api/places" }
+        },
+        "booking": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/bookings/{**catch-all}" },
+            "AuthorizationPolicy": "default"
+        },
+        "booking_exact": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/bookings" },
+            "AuthorizationPolicy": "default"
+        },
+        "provider": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/providers/{**catch-all}" }
+        },
+        "provider_exact": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/providers" }
+        },
+        "provider_singular": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/provider/{**catch-all}" }
+        },
+        "provider_singular_exact": {
+            "ClusterId": "booking",
+            "Match": { "Path": "/api/provider" }
+        },
+        "community_reviews": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/reviews/{**catch-all}" }
+        },
+        "community_reviews_exact": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/reviews" }
+        },
+        "community_feeds": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/feeds/{**catch-all}" }
+        },
+        "community_feeds_exact": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/feeds" }
+        },
+        "community_user_follow": {
+            "ClusterId": "community",
+            "Match": { "Path": "/api/users/{id}/follow" },
+            "AuthorizationPolicy": "default"
+        },
+        "admin_uploads": {
+            "ClusterId": "admin",
+            "Order": -100,
+            "Match": {
+                "Path": "/api/admin/uploads/{**catch-all}"
+            }
+         },
+        "admin": {
+            "ClusterId": "admin",
+            "Match": { "Path": "/api/admin/{**catch-all}" },
+            "AuthorizationPolicy": "AdminOnly"
+        },
+        "admin_exact": {
+            "ClusterId": "admin",
+            "Match": { "Path": "/api/admin" },
+            "AuthorizationPolicy": "AdminOnly"
+        }
     },
     "Clusters": {
       "auth": {

@@ -33,6 +33,11 @@ public static class DependencyInjection
         services.AddScoped<Admin.IAdminService, Admin.AdminService>();
         services.AddScoped<Admin.IModerationService, Admin.ModerationService>();
         services.AddScoped<Admin.ICategoryService, Admin.CategoryService>();
+        services.AddScoped<Admin.IDestinationAdminService, Admin.DestinationAdminService>();
+        services.AddScoped<Admin.IBlogAdminService, Admin.BlogAdminService>();
+        services.AddScoped<Admin.IProviderAdminService, Admin.ProviderAdminService>();
+        services.AddScoped<Admin.IServiceAdminService, Admin.ServiceAdminService>();
+        services.AddScoped<Admin.IAdminUploadService, Admin.AdminUploadService>();
         services.AddScoped<Notifications.INotificationService, Notifications.NotificationService>();
         services.AddScoped<Providers.IProviderService, Providers.ProviderService>();
         services.AddScoped<Providers.IProviderPackageValidationService, Providers.ProviderPackageValidationService>();

@@ -23,6 +23,13 @@ export const exploreApi = baseApi.injectEndpoints({
         params,
       }),
     }),
+    getNearbyResources: builder.query<any, number>({
+      query: (placeId) => ({
+        url: "/explore/nearby",
+        method: "GET",
+        params: { placeId },
+      }),
+    }),
     getDestinationDetails: builder.query<any, number>({
       query: (id) => ({
         url: `/destinations/${id}`,
@@ -89,4 +96,6 @@ export const {
   useSubmitServiceReviewMutation,
   useGetTrendingDestinationsQuery,
   useGetTrendingTripsQuery,
+  useLazyGetNearbyResourcesQuery,
+  useLazyGetExploreGridQuery,
 } = exploreApi;

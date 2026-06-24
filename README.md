@@ -2,6 +2,11 @@
 
 Current source of truth: CRD v3 plus the live DB, backend, Gateway, active router, tests, and runtime evidence.
 
+## Documentation
+- **Core Requirements:** `docs/CRD_EZtravel_v3.docx`, `docs/SRS_ezTravel_v1_4.docx`
+- **Project Guidelines:** `docs/project/01_PROJECT_CONSTITUTION.md`
+- **Screenshots:** `docs/screenshot/` (Latest full system screenshots for all roles and themes)
+
 ## End-to-End Definition Of Done
 
 A business workflow is complete only when its schema/migration, service logic, controller contract, Gateway route, active UI, validation/security, automated tests, and desktop/mobile runtime acceptance all pass. A backend-only endpoint or a UI-only screen is not complete.
@@ -73,3 +78,151 @@ Do not add these to the implementation backlog: booking engine, room/seat availa
 - Added Trip metadata update and exposed maximum budget separately from estimated cost.
 - Added refresh-token rotation/replay rejection/logout, in-memory access-token handling, SMTP OTP delivery adapter, resend cooldown, and 15-minute OTP lock.
 - Corrected Auth form, OTP, and checkbox dimensions and verified responsive Login/Planner rendering.
+
+## System Endpoints
+
+### AdminController (Microservices)
+
+- **GET** `/api/admin/users`
+- **PUT** `/api/admin/users/{id}/status`
+- **PUT** `/api/admin/users/{id}/role`
+- **GET** `/api/admin/stats`
+- **GET** `/api/admin/alerts`
+- **GET** `/api/admin/providers`
+- **GET** `/api/admin/providers/pending`
+- **PUT** `/api/admin/providers/{id}/status`
+- **PUT** `/api/admin/providers/{id}`
+- **DELETE** `/api/admin/providers/{id}`
+- **GET** `/api/admin/provider-packages`
+- **POST** `/api/admin/provider-packages`
+- **PUT** `/api/admin/provider-packages/{id}`
+- **PUT** `/api/admin/provider-packages/{id}/status`
+- **GET** `/api/admin/moderation`
+- **POST** `/api/admin/moderation/{id}/resolve`
+- **GET** `/api/admin/categories`
+- **POST** `/api/admin/categories`
+- **PUT** `/api/admin/categories/{id}`
+- **DELETE** `/api/admin/categories/{id}`
+- **GET** `/api/admin/destinations`
+- **POST** `/api/admin/destinations`
+- **PUT** `/api/admin/destinations/{id}`
+- **DELETE** `/api/admin/destinations/{id}`
+- **GET** `/api/admin/blogs`
+- **POST** `/api/admin/blogs`
+- **PUT** `/api/admin/blogs/{id}`
+- **PUT** `/api/admin/blogs/{id}/status`
+- **DELETE** `/api/admin/blogs/{id}`
+- **GET** `/api/admin/services`
+- **PUT** `/api/admin/services/{id}/status`
+- **PUT** `/api/admin/services/{id}`
+- **DELETE** `/api/admin/services/{id}`
+- **POST** `/api/admin/upload`
+- **GET** `/api/admin/uploads/{filename}`
+
+### AuthController (Microservices)
+
+- **POST** `/api/auth/login`
+- **POST** `/api/auth/refresh`
+- **POST** `/api/auth/logout`
+- **POST** `/api/auth/register`
+- **POST** `/api/auth/verify-otp`
+- **POST** `/api/auth/resend-otp`
+- **POST** `/api/auth/forgot-password`
+- **POST** `/api/auth/reset-password`
+
+### NotificationController (Microservices)
+
+- **GET** `/api/notifications`
+- **PUT** `/api/notifications/{id}/read`
+
+### ProfileController (Microservices)
+
+- **GET** `/api/profile`
+
+### ProviderController (Microservices)
+
+- **POST** `/api/provider/register`
+- **POST** `/api/provider/upload-docs`
+- **GET** `/api/provider/documents/{id:int}/download`
+- **GET** `/api/provider/status`
+- **GET** `/api/provider/stats`
+- **GET** `/api/provider/services`
+- **POST** `/api/provider/services`
+- **PUT** `/api/provider/services/{id}`
+- **DELETE** `/api/provider/services/{id}`
+- **GET** `/api/provider/reviews`
+- **POST** `/api/provider/reviews/{id}/reply`
+- **GET** `/api/packages/provider`
+- **GET** `/api/provider/packages/current`
+- **GET** `/api/provider/packages/history`
+- **GET** `/api/provider/packages/payments`
+- **POST** `/api/provider/packages/subscribe-simulated`
+
+### TravelerPackageController (Microservices)
+
+- **GET** `/api/packages/traveler`
+- **GET** `/api/packages/traveler/current`
+- **GET** `/api/packages/traveler/history`
+- **POST** `/api/packages/traveler/subscribe-simulated`
+
+### BlogController (Microservices)
+
+- **GET** `/api/blogs`
+- **GET** `/api/blogs/{id}`
+- **POST** `/api/blogs`
+- **GET** `/api/blogs/{id}/comments`
+- **POST** `/api/blogs/{id}/comments`
+
+### CommunityController (Microservices)
+
+- **GET** `/api/community/feed`
+- **POST** `/api/trips/{id}/like`
+- **GET** `/api/public/home/trending-trips`
+- **GET** `/api/community/top-bloggers`
+- **POST** `/api/users/{id}/follow`
+
+### TripCommentController (Microservices)
+
+- **GET** `/api/trips/{tripId:int}/comments`
+- **POST** `/api/trips/{tripId:int}/comments`
+
+### ExploreController (Microservices)
+
+- **GET** `/api/categories/regions`
+- **GET** `/api/categories/tags`
+- **GET** `/api/explore`
+- **GET** `/api/destinations/{id:int}`
+- **GET** `/api/destinations/{id:int}/services`
+- **GET** `/api/public/home/trending-destinations`
+- **GET** `/api/explore/nearby`
+
+### ServiceController (Microservices)
+
+- **GET** `/api/services/{id:int}`
+- **GET** `/api/services/{id:int}/reviews`
+- **POST** `/api/services/{id:int}/reviews`
+
+### AIController (Microservices)
+
+- **POST** `/api/ai/generate`
+- **POST** `/api/ai/chat`
+- **POST** `/api/ai/optimize-route`
+- **POST** `/api/ai/analyze-budget`
+
+### TripCollaboratorController (Microservices)
+
+- **GET** `/api/trips/{id:int}/collaborators`
+- **POST** `/api/trips/{id:int}/collaborators`
+
+### TripController (Microservices)
+
+- **GET** `/api/trips`
+- **POST** `/api/trips`
+- **PUT** `/api/trips/{id:int}`
+- **DELETE** `/api/trips/{id:int}`
+- **GET** `/api/trips/{id:int}`
+- **GET** `/api/trips/{id:int}/timeline`
+- **PUT** `/api/trips/{id:int}/timeline`
+- **POST** `/api/trips/{id:int}/clone`
+- **GET** `/api/trips/upcoming`
+- **GET** `/api/traveler/dashboard/stats`

@@ -9,6 +9,7 @@ public interface ICategoryService
 {
     Task<object> GetCategoriesAsync();
     Task<object> CreateCategoryAsync(CreateCategoryRequest request);
+    Task<object> UpdateCategoryAsync(int id, UpdateCategoryRequest request);
     Task<object> DeleteCategoryAsync(int id);
 }
 
@@ -60,6 +61,50 @@ public class CategoryService : ICategoryService
         };
 
         await _uow.Tags.AddAsync(tag);
+        await _uow.SaveChangesAsync();
+
+        return MapTag(tag);
+    }
+
+    public async Task<object> UpdateCategoryAsync(int id, UpdateCategoryRequest request)
+    {
+        var tag = await _uow.Tags.GetByIdAsync(id);
+        if (tag == null)
+        {
+            return new AdminServiceError("Khong tim thay danh muc.", 404);
+        }
+
+        var name = TrimToNull(request.Name);
+        if (name == null)
+        {
+            return new AdminServiceError("Ten danh muc la bat buoc.");
+        }
+
+        var type = TrimToNull(request.Type) ?? "GENERAL";
+        var normalizedName = Clamp(name, 100);
+        var normalizedType = Clamp(type.ToUpperInvariant(), 50);
+
+        var exists = await _uow.Tags.AnyAsync(t =>
+            t.MaTag != id &&
+            t.TenTag == normalizedName &&
+            (t.LoaiTag ?? "GENERAL") == normalizedType);
+
+        if (exists)
+        {
+            return new AdminServiceError("Danh muc da ton tai.");
+        }
+
+        tag.TenTag = normalizedName;
+        tag.LoaiTag = normalizedType;
+        if (request.ThumbnailUrl != null)
+        {
+            // Note: Tag entity may not have an IconUrl/ThumbnailUrl in the current schema. 
+            // We'll update it if it exists or ignore if it doesn't. 
+            // For now we map it conceptually.
+            // tag.IconUrl = request.ThumbnailUrl;
+        }
+
+        _uow.Tags.Update(tag);
         await _uow.SaveChangesAsync();
 
         return MapTag(tag);

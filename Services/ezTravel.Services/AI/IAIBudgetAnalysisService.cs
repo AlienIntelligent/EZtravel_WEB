@@ -62,12 +62,54 @@ public class AIBudgetAnalysisService : AiServiceBase, IAIBudgetAnalysisService
         }
 
         var budgetLimit = trip.NganSachToiDa ?? 0m;
-        var status = budgetLimit <= 0
-            ? "NO_LIMIT"
-            : totalEstimated <= budgetLimit ? "ON_TRACK" : "OVER_BUDGET";
         var difference = budgetLimit > 0 ? budgetLimit - totalEstimated : 0m;
-        var analysisText = BuildAnalysisText(totalEstimated, budgetLimit, status, difference, services.Count);
-        var historyId = await SaveHistoryAsync(userId, "BUDGET_ANALYSIS", request, analysisText);
+        
+        var servicesJson = System.Text.Json.JsonSerializer.Serialize(services.Select(s => new {
+            s.MaDichVuNavigation.TenDichVu,
+            s.MaDichVuNavigation.LoaiDichVu,
+            Price = s.ChiPhiDichVuLichTrinh.FirstOrDefault()?.SoTien ?? s.MaDichVuNavigation.GiaTu ?? 0m
+        }));
+
+        var systemPrompt = @"Bạn là chuyên gia tư vấn tài chính du lịch. Nhiệm vụ của bạn là phân tích ngân sách chuyến đi.
+YÊU CẦU:
+- Phân tích các khoản chi tiêu dựa trên danh sách dịch vụ.
+- Đưa ra lời khuyên thiết thực (nếu vượt ngân sách thì cắt giảm gì, nếu còn dư thì nâng cấp gì).
+- Trả về định dạng JSON hợp lệ tuân thủ Schema sau:
+{
+  ""status"": ""ON_TRACK"" | ""OVER_BUDGET"",
+  ""analysisText"": ""Văn bản phân tích chi tiết thân thiện..."",
+  ""savingsTips"": [""Mẹo 1"", ""Mẹo 2""]
+}";
+
+        var userPrompt = $"Tổng chi phí ước tính: {totalEstimated} VND. Ngân sách tối đa: {budgetLimit} VND.\nDanh sách chi tiêu:\n{servicesJson}";
+
+        string status = budgetLimit <= 0 ? "NO_LIMIT" : (totalEstimated <= budgetLimit ? "ON_TRACK" : "OVER_BUDGET");
+        string analysisText;
+        List<string> savingsTips = new List<string>();
+
+        try
+        {
+            var jsonResponse = await CallGeminiJsonAsync(systemPrompt, userPrompt);
+            using var doc = System.Text.Json.JsonDocument.Parse(jsonResponse);
+            
+            status = doc.RootElement.GetProperty("status").GetString() ?? status;
+            analysisText = doc.RootElement.GetProperty("analysisText").GetString() ?? BuildAnalysisText(totalEstimated, budgetLimit, status, difference, services.Count);
+            
+            if (doc.RootElement.TryGetProperty("savingsTips", out var tipsArray))
+            {
+                for (int i = 0; i < tipsArray.GetArrayLength(); i++)
+                {
+                    savingsTips.Add(tipsArray[i].GetString() ?? "");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("AI Budget Analysis Failed, falling back. " + ex.Message);
+            analysisText = BuildAnalysisText(totalEstimated, budgetLimit, status, difference, services.Count);
+        }
+
+        var historyId = await SaveHistoryAsync(userId, "TU_VAN_NGAN_SACH", request, analysisText);
 
         return new
         {
@@ -78,7 +120,8 @@ public class AIBudgetAnalysisService : AiServiceBase, IAIBudgetAnalysisService
             difference,
             status,
             serviceCount = services.Count,
-            source = "eztravel-db-budget",
+            savingsTips,
+            source = "gemini-ai-budget",
             historyId,
             maLichSuAi = historyId
         };

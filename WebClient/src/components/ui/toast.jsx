@@ -96,8 +96,8 @@ function ToastItem({
   </div>
   <button
         onClick={() => dismiss(toast.id)}
-        aria-label="Dong thong bao"
-        title="Dong thong bao"
+        aria-label="Đóng thông báo"
+        title="Đóng thông báo"
         className="opacity-70 hover:opacity-100 transition-opacity p-0.5 rounded cursor-pointer">
         
     <X className="w-4 h-4" />

@@ -1,0 +1,10 @@
+import React from 'react';
+
+export default function Bookings() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-foreground mb-2">Quản lý Đặt chỗ</h1>
+      <p className="text-muted-foreground">Tính năng đang trong quá trình phát triển.</p>
+    </div>
+  );
+}

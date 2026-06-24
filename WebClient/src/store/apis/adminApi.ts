@@ -169,12 +169,116 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Admin"],
     }),
+    updateCategory: builder.mutation<any, { id: number; body: any }>({
+      query: ({ id, body }) => ({
+        url: `/admin/categories/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
     deleteCategory: builder.mutation<any, number>({
       query: (id) => ({
         url: `/admin/categories/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Admin"],
+    }),
+    getAdminPlaces: builder.query<any, void>({
+      query: () => ({ url: "/admin/destinations" }),
+      providesTags: ["Admin"],
+    }),
+    createAdminPlace: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/admin/destinations",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    updateAdminPlace: builder.mutation<any, { id: number; body: any }>({
+      query: ({ id, body }) => ({
+        url: `/admin/destinations/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    deleteAdminPlace: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/admin/destinations/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    getAdminBlogs: builder.query<any, void>({
+      query: () => ({ url: "/admin/blogs" }),
+      providesTags: ["Admin"],
+    }),
+    createAdminBlog: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/admin/blogs",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    updateAdminBlog: builder.mutation<any, { id: number; body: any }>({
+      query: ({ id, body }) => ({
+        url: `/admin/blogs/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    updateAdminBlogStatus: builder.mutation<any, { id: number; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/admin/blogs/${id}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    deleteAdminBlog: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/admin/blogs/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    getAdminServices: builder.query<any, void>({
+      query: () => ({ url: "/admin/services" }),
+      providesTags: ["Admin"],
+    }),
+    updateAdminServiceStatus: builder.mutation<any, { id: number; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/admin/services/${id}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    updateAdminService: builder.mutation<any, { id: number; body: any }>({
+      query: ({ id, body }) => ({
+        url: `/admin/services/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    deleteAdminService: builder.mutation<any, number>({
+      query: (id) => ({
+        url: `/admin/services/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+    uploadAdminImage: builder.mutation<{ url: string }, FormData>({
+      query: (formData) => ({
+        url: "/admin/upload",
+        method: "POST",
+        body: formData,
+      }),
     }),
   }),
   overrideExisting: false,
@@ -187,7 +291,10 @@ export const {
   useGetAdminStatsQuery,
   useGetAdminAlertsQuery,
   useGetPendingProvidersQuery,
+  useGetAllProvidersQuery,
   useUpdateProviderStatusMutation,
+  useUpdateProviderMutation,
+  useDeleteProviderMutation,
   useGetAdminProviderPackagesQuery,
   useCreateAdminProviderPackageMutation,
   useUpdateAdminProviderPackageMutation,
@@ -196,5 +303,20 @@ export const {
   useResolveModerationItemMutation,
   useGetCategoriesQuery,
   useCreateCategoryMutation,
+  useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useGetAdminPlacesQuery,
+  useCreateAdminPlaceMutation,
+  useUpdateAdminPlaceMutation,
+  useDeleteAdminPlaceMutation,
+  useGetAdminBlogsQuery,
+  useCreateAdminBlogMutation,
+  useUpdateAdminBlogMutation,
+  useUpdateAdminBlogStatusMutation,
+  useDeleteAdminBlogMutation,
+  useGetAdminServicesQuery,
+  useUpdateAdminServiceStatusMutation,
+  useUpdateAdminServiceMutation,
+  useDeleteAdminServiceMutation,
+  useUploadAdminImageMutation,
 } = adminApi;

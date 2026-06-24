@@ -31,13 +31,10 @@ Khi có mâu thuẫn giữa các nguồn tài liệu, thứ tự ưu tiên như 
 
 Các tài liệu sau chỉ mang tính tham khảo:
 
-- `SYSTEM_ARCHITECTURE.md`
-- `SERVICE_PROVIDER_REVIEW.md`
-- `FRONTEND_REDESIGN_PLAN.md`
-- `UI_ARCHITECTURE.md`
-- `DESIGN_SYSTEM_V2.md`
-- Mọi file `.md` khác trong `/docs/`
-
+- Thư mục `docs/architecture/`
+- Thư mục `docs/project/`
+- Thư mục `docs/screenshot/` (Ảnh chụp toàn hệ thống)
+- Mọi file `.md` khác còn lại trong `/docs/`
 ---
 
 ## II. CHÍNH SÁCH KHÓA DATABASE (Database Lock Policy)

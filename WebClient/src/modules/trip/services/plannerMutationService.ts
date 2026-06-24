@@ -8,7 +8,9 @@ export const handleDnDDrop = (
     event: DragEndEvent,
     draggedItem: TripPlace | TripService | undefined,
     dispatch: AppDispatch,
-    servicesDictionary: Record<string, any>
+    servicesDictionary: Record<string, any>,
+    explicitDayId?: string,
+    explicitTargetIndex?: number
 ) => {
     if (!event.over || !draggedItem) return;
 
@@ -29,8 +31,8 @@ export const handleDnDDrop = (
     }
 
     const draggedType = 'serviceId' in draggedItem ? 'SERVICE' : 'PLACE';
-    const dayId = over.data?.current?.dayId as string;
-    const targetIndex = over.data?.current?.index ?? 0;
+    const dayId = explicitDayId ?? (over.data?.current?.dayId as string);
+    const targetIndex = explicitTargetIndex ?? (over.data?.current?.index ?? -1);
 
     // Persistable timeline rows are intentionally flat. The backend can then
     // rebuild the same day/item graph after refresh without losing identities.

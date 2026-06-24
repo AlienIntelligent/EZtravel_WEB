@@ -123,6 +123,24 @@ const tripSlice = createSlice({
             state.scratchpadPlaces = action.payload.places;
             state.scratchpadServices = action.payload.services;
         },
+        appendScratchpad: (state, action: PayloadAction<{ places: TripPlace[]; services: TripService[] }>) => {
+            const existingPlaceIds = new Set(state.scratchpadPlaces.map(p => p.placeId));
+            const existingServiceIds = new Set(state.scratchpadServices.map(s => s.serviceId));
+
+            action.payload.places.forEach(p => {
+                if (!existingPlaceIds.has(p.placeId)) {
+                    state.scratchpadPlaces.push(p);
+                    existingPlaceIds.add(p.placeId);
+                }
+            });
+
+            action.payload.services.forEach(s => {
+                if (!existingServiceIds.has(s.serviceId)) {
+                    state.scratchpadServices.push(s);
+                    existingServiceIds.add(s.serviceId);
+                }
+            });
+        },
         
         // DnD Actions
         moveItemToDay: (state, action: PayloadAction<{ 
@@ -219,7 +237,9 @@ const tripSlice = createSlice({
         insertTimelineNode: (state, action: PayloadAction<{ dayId: string; index: number; node: TimelineNode }>) => {
             const day = state.timelineDays.find(d => d.id === action.payload.dayId);
             if (day) {
-                day.nodes.splice(action.payload.index, 0, action.payload.node);
+                let index = action.payload.index;
+                if (index < 0) index = day.nodes.length;
+                day.nodes.splice(index, 0, action.payload.node);
                 day.nodes.forEach((n, idx) => n.sequence = idx);
                 state.budgetSummary = calculateBudget(state.timelineDays, state.servicesDictionary);
             }
@@ -361,6 +381,7 @@ export const {
     setSelectedDay,
     setTimelineDays,
     setScratchpad,
+    appendScratchpad,
     moveItemToDay,
     moveItemToScratchpad,
     insertTimelineNode,

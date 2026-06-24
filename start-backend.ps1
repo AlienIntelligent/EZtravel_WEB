@@ -71,3 +71,6 @@ Write-Host ""
 Write-Host "Logs: $LogDir" -ForegroundColor Gray
 Write-Host "Stop: .\start-backend.ps1 -Stop" -ForegroundColor Gray
 Write-Host ""
+
+Write-Host 'Press Ctrl+C to stop' -ForegroundColor Cyan
+Wait-Job -Name ez-*

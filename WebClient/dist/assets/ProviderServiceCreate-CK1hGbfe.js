@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-m7G7yzlP.js";import{t}from"./ProviderServiceFormPage-BE-P1hir.js";var n=e();function r(){return(0,n.jsx)(t,{mode:`create`})}export{r as default};

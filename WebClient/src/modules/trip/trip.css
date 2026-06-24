@@ -8,14 +8,14 @@
    SHARED TOKENS
 ══════════════════════════════════════════ */
 :root {
-  --color-primary: #ff5a5f;
-  --color-primary-dark: #e5484d;
-  --color-accent: #f39c12;           /* warm orange */
-  --color-bg: #f5f7fb;
-  --color-white: #ffffff;
-  --color-text: #2f3542;
-  --color-muted: #74788d;
-  --color-border: #e8eaf0;
+  --color-primary: hsl(var(--primary));
+  --color-primary-dark: hsl(var(--primary) / 0.8);
+  --color-accent: hsl(var(--accent));           /* warm orange */
+  --color-bg: hsl(var(--background));
+  --color-white: hsl(var(--card));
+  --color-text: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
   --radius-card: 8px;
   --radius-btn: 8px;
   --shadow-card: 0 1px 3px rgba(15, 23, 42, .08);
@@ -208,7 +208,7 @@
 /* View Toggle */
 .trips-view-toggle {
   display: flex;
-  background: #f0f0f0;
+  background: var(--color-border);
   border-radius: 10px;
   padding: 3px;
 }
@@ -520,8 +520,8 @@
 }
 /* Override for list mode */
 .trip-list-card .trip-action-btn {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--color-border);
+  color: var(--color-muted);
 }
 .trip-list-card .trip-action-btn--delete { color: #ef4444; }
 
@@ -651,7 +651,7 @@
 .td-btn-create:hover { background: var(--color-primary-dark); }
 
 .td-trip-info__strip {
-  background: #f8f9fa;
+  background: var(--color-border);
   border-radius: 8px;
   border-left: 4px solid var(--color-accent);
   padding: 14px;
@@ -671,8 +671,8 @@
   transition: var(--transition);
 }
 .td-btn-action--edit {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: var(--color-border);
+  color: var(--color-text);
 }
 .td-btn-action--edit:hover { background: #c7d2fe; }
 
@@ -705,8 +705,8 @@
 .td-scratchpad-item__price { font-size: 12px; color: var(--color-primary); font-weight: 600; }
 .td-scratchpad-item__type {
   font-size: 10px;
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--color-border);
+  color: var(--color-text);
   padding: 2px 8px;
   border-radius: 10px;
   flex-shrink: 0;
@@ -779,7 +779,7 @@
 .td-day-card__date { font-size: 12px; color: var(--color-muted); margin-top: 2px; }
 
 .td-day-badge {
-  background: #f1f5f9;
+  background: var(--color-border);
   color: var(--color-text);
   padding: 5px 14px;
   border-radius: 20px;
@@ -803,12 +803,12 @@
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  background: #f8f9fb;
+  background: var(--color-bg);
   border-radius: 8px;
   padding: 12px 14px;
   transition: var(--transition);
 }
-.td-timeline-item:hover { background: #f0f4ff; }
+.td-timeline-item:hover { background: var(--color-border); }
 
 .td-timeline-item__time {
   font-size: 13px;
@@ -898,15 +898,15 @@
   letter-spacing: .5px;
   color: var(--color-muted);
   border-bottom: 1px solid var(--color-border);
-  background: #f8f9fb;
+  background: var(--color-bg);
 }
 .td-budget-table td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--color-border); vertical-align: middle; }
 .td-budget-table tbody tr:last-child td { border-bottom: none; }
-.td-budget-table tbody tr:hover { background: #f8f9fb; }
+.td-budget-table tbody tr:hover { background: var(--color-bg); }
 .text-right { text-align: right; }
 .td-budget-cost { font-weight: 700; color: var(--color-primary); }
 .td-budget-empty { text-align: center; color: var(--color-muted); padding: 32px !important; }
-.td-budget-total-row { background: #f8f9fb; }
+.td-budget-total-row { background: var(--color-bg); }
 .td-budget-total-row td { font-weight: 700; font-size: 15px; color: #ef4444; }
 
 /* ── Right: Map ── */

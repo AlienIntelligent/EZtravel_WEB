@@ -42,4 +42,11 @@ public class ExploreController : ControllerBase
     [HttpGet("api/public/home/trending-destinations")]
     public async Task<IActionResult> GetTrendingDestinations()
         => Ok(await _exploreService.GetTrendingDestinationsAsync());
+
+    [HttpGet("api/explore/nearby")]
+    public async Task<IActionResult> GetNearbyResources([FromQuery] int placeId)
+    {
+        if (placeId <= 0) return BadRequest(new { error = "placeId là bắt buộc." });
+        return Ok(await _exploreService.GetNearbyResourcesAsync(placeId));
+    }
 }

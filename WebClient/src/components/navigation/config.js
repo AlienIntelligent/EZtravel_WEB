@@ -116,10 +116,10 @@ export const SIDEBAR_CONFIG = [
       },
       {
         label: 'Đặt chỗ',
-        route: '/provider/bookings',
+        route: PROVIDER_APPROVED_ROUTES.BOOKINGS,
         icon: Calendar,
         roles: [ROLES.PROVIDER_APPROVED],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Bảng giá',
@@ -158,24 +158,24 @@ export const SIDEBAR_CONFIG = [
       },
       {
         label: 'Phân tích',
-        route: '/provider/analytics',
+        route: PROVIDER_APPROVED_ROUTES.ANALYTICS,
         icon: TrendingUp,
         roles: [ROLES.PROVIDER_APPROVED],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Tài chính',
-        route: '/provider/finance',
+        route: PROVIDER_APPROVED_ROUTES.FINANCE,
         icon: Wallet,
         roles: [ROLES.PROVIDER_APPROVED],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Cài đặt',
-        route: '/provider/settings',
+        route: PROVIDER_APPROVED_ROUTES.SETTINGS,
         icon: Settings,
         roles: [ROLES.PROVIDER_APPROVED],
-        status: 'hidden'
+        status: 'active'
       }
     ]
   },
@@ -198,18 +198,11 @@ export const SIDEBAR_CONFIG = [
         status: 'active'
       },
       {
-        label: 'Kiểm duyệt',
-        route: ADMIN_ROUTES.MODERATION,
-        icon: AlertTriangle,
-        roles: [ROLES.ADMIN],
-        status: 'active'
-      },
-      {
         label: 'Dịch vụ',
-        route: '/admin/services',
+        route: ADMIN_ROUTES.MODERATION,
         icon: Layers,
         roles: [ROLES.ADMIN],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Danh mục',
@@ -227,31 +220,31 @@ export const SIDEBAR_CONFIG = [
       },
       {
         label: 'Địa điểm',
-        route: '/admin/locations',
+        route: ADMIN_ROUTES.LOCATIONS,
         icon: MapPin,
         roles: [ROLES.ADMIN],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Cộng đồng',
-        route: '/admin/community',
+        route: ADMIN_ROUTES.COMMUNITY,
         icon: MessageSquare,
         roles: [ROLES.ADMIN],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Báo cáo',
-        route: '/admin/reports',
+        route: ADMIN_ROUTES.REPORTS,
         icon: AlertTriangle,
         roles: [ROLES.ADMIN],
-        status: 'hidden'
+        status: 'active'
       },
       {
         label: 'Hệ thống',
-        route: '/admin/system',
+        route: ADMIN_ROUTES.SYSTEM,
         icon: Settings,
         roles: [ROLES.ADMIN],
-        status: 'hidden'
+        status: 'active'
       }
     ]
   }
